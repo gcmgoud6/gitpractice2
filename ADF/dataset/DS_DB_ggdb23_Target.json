@@ -1,0 +1,58 @@
+{
+	"name": "DS_DB_ggdb23_Target",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "LS_DB_ggdb22_Target",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"DSTable_Name": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "orderid",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "itemname",
+				"type": "varchar"
+			},
+			{
+				"name": "price_of_item",
+				"type": "decimal",
+				"precision": 10,
+				"scale": 2
+			},
+			{
+				"name": "quantity",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "total_cost",
+				"type": "decimal",
+				"precision": 10,
+				"scale": 2
+			},
+			{
+				"name": "LastModifytime",
+				"type": "datetime",
+				"precision": 23,
+				"scale": 3
+			}
+		],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": {
+				"value": "@dataset().DSTable_Name",
+				"type": "Expression"
+			}
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}
