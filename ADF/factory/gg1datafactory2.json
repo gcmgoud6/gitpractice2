@@ -1,9 +1,0 @@
-{
-	"name": "gg1datafactory2",
-	"location": "centralindia",
-	"identity": {
-		"type": "SystemAssigned",
-		"principalId": "13868f38-a124-4327-add4-7fcecbbfe528",
-		"tenantId": "6c0dc597-2bf7-473a-9111-4caac1ba1bfa"
-	}
-}
