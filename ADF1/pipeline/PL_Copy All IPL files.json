@@ -19,7 +19,9 @@
 						"type": "DelimitedTextSource",
 						"storeSettings": {
 							"type": "AzureBlobFSReadSettings",
-							"fileListPath": "adf1-source",
+							"recursive": true,
+							"modifiedDatetimeStart": null,
+							"modifiedDatetimeEnd": "2024-07-05T12:00:00.000Z",
 							"enablePartitionDiscovery": false
 						},
 						"formatSettings": {

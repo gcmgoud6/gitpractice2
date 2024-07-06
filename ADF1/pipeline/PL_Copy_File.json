@@ -3,7 +3,7 @@
 	"properties": {
 		"activities": [
 			{
-				"name": "Copy data1",
+				"name": "Copy All Files",
 				"type": "Copy",
 				"dependsOn": [],
 				"policy": {
@@ -18,7 +18,7 @@
 					"source": {
 						"type": "DelimitedTextSource",
 						"storeSettings": {
-							"type": "AzureBlobStorageReadSettings",
+							"type": "AzureBlobFSReadSettings",
 							"recursive": true,
 							"enablePartitionDiscovery": false
 						},
@@ -49,7 +49,7 @@
 				},
 				"inputs": [
 					{
-						"referenceName": "DS_Storage_gg1storage3_Source",
+						"referenceName": "DS_ADLS_ListOfFiles_Dynamic",
 						"type": "DatasetReference"
 					}
 				],
