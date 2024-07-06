@@ -30,7 +30,7 @@
 			"value": "ggouddbserver"
 		},
 		"LS_HttpServer_GitHub_properties_typeProperties_url": {
-			"value": "https://github.com/gcmgoud6/gitpractice2/tree/main"
+			"value": "https://github.com/gcmgoud6/gitpractice2/tree/main/"
 		},
 		"containerUri": {
 			"value": ""
