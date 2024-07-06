@@ -10,8 +10,7 @@
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobFSLocation",
-				"fileName": "Files.txt",
-				"fileSystem": "adf1-raw"
+				"fileSystem": "adf1-source"
 			},
 			"columnDelimiter": ",",
 			"escapeChar": "\\",
