@@ -20,6 +20,7 @@
 						"storeSettings": {
 							"type": "AzureBlobFSReadSettings",
 							"recursive": true,
+							"wildcardFileName": "*.csv",
 							"enablePartitionDiscovery": false
 						},
 						"formatSettings": {
@@ -29,7 +30,7 @@
 					"sink": {
 						"type": "DelimitedTextSink",
 						"storeSettings": {
-							"type": "AzureBlobStorageWriteSettings"
+							"type": "AzureBlobFSWriteSettings"
 						},
 						"formatSettings": {
 							"type": "DelimitedTextWriteSettings",
@@ -50,17 +51,29 @@
 				"inputs": [
 					{
 						"referenceName": "DS_ADLS_ListOfFiles_Dynamic",
-						"type": "DatasetReference"
+						"type": "DatasetReference",
+						"parameters": {
+							"ds_containdername": {
+								"value": "@pipeline().parameters.pl_containername",
+								"type": "Expression"
+							}
+						}
 					}
 				],
 				"outputs": [
 					{
-						"referenceName": "DS_Storage_gg1storage3_Target",
+						"referenceName": "DS_ADLS_adf1_raw_Target",
 						"type": "DatasetReference"
 					}
 				]
 			}
 		],
+		"parameters": {
+			"pl_containername": {
+				"type": "string",
+				"defaultValue": "adf1-source"
+			}
+		},
 		"annotations": [],
 		"lastPublishTime": "2024-05-25T12:18:44Z"
 	},
