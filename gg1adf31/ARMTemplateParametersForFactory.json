@@ -1,0 +1,36 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"value": "gg1adf31"
+		},
+		"LS_ADLS_gg1adls3_accountKey": {
+			"value": ""
+		},
+		"LS_DB_ggdb1soruce_Dataflow_connectionString": {
+			"value": ""
+		},
+		"LS_DB_ggdb1source_password": {
+			"value": ""
+		},
+		"LS_Storage_gg1storage3_connectionString": {
+			"value": ""
+		},
+		"LS_ADLS_gg1adls3_properties_typeProperties_url": {
+			"value": "https://gg1adls3.dfs.core.windows.net/"
+		},
+		"LS_DB_ggdb1source_properties_typeProperties_server": {
+			"value": "ggouddbserver.database.windows.net"
+		},
+		"LS_DB_ggdb1source_properties_typeProperties_database": {
+			"value": "ggdb1source"
+		},
+		"LS_DB_ggdb1source_properties_typeProperties_userName": {
+			"value": "ggouddbserver"
+		},
+		"LS_HttpServer_GitHub_properties_typeProperties_url": {
+			"value": "https://github.com/gcmgoud6/gitpractice2/tree/main"
+		}
+	}
+}

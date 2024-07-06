@@ -1,0 +1,125 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "Data Factory name",
+			"defaultValue": "gg1adf31"
+		},
+		"LS_ADLS_gg1adls3_accountKey": {
+			"type": "secureString",
+			"metadata": "Secure string for 'accountKey' of 'LS_ADLS_gg1adls3'"
+		},
+		"LS_DB_ggdb1soruce_Dataflow_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'LS_DB_ggdb1soruce_Dataflow'"
+		},
+		"LS_DB_ggdb1source_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'LS_DB_ggdb1source'"
+		},
+		"LS_Storage_gg1storage3_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'LS_Storage_gg1storage3'"
+		},
+		"LS_ADLS_gg1adls3_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://gg1adls3.dfs.core.windows.net/"
+		},
+		"LS_DB_ggdb1source_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "ggouddbserver.database.windows.net"
+		},
+		"LS_DB_ggdb1source_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "ggdb1source"
+		},
+		"LS_DB_ggdb1source_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "ggouddbserver"
+		},
+		"LS_HttpServer_GitHub_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://github.com/gcmgoud6/gitpractice2/tree/main"
+		},
+		"containerUri": {
+			"type": "string",
+			"metadata": "URI to storage account containing linked ARM templates"
+		},
+		"containerSasToken": {
+			"type": "string",
+			"metadata": "Sas token to storage account containing linked ARM templates"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "gg1adf31_ArmTemplate_0",
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2018-02-01",
+			"properties": {
+				"mode": "incremental",
+				"templateLink": {
+					"uri": "[concat(parameters('containerUri'), '/ArmTemplate_0.json', parameters('containerSasToken'))]",
+					"contentVersion": "1.0.0.0"
+				},
+				"parameters": {
+					"factoryName": {
+						"value": "[parameters('factoryName')]"
+					},
+					"LS_ADLS_gg1adls3_accountKey": {
+						"value": "[parameters('LS_ADLS_gg1adls3_accountKey')]"
+					},
+					"LS_DB_ggdb1soruce_Dataflow_connectionString": {
+						"value": "[parameters('LS_DB_ggdb1soruce_Dataflow_connectionString')]"
+					},
+					"LS_DB_ggdb1source_password": {
+						"value": "[parameters('LS_DB_ggdb1source_password')]"
+					},
+					"LS_Storage_gg1storage3_connectionString": {
+						"value": "[parameters('LS_Storage_gg1storage3_connectionString')]"
+					},
+					"LS_ADLS_gg1adls3_properties_typeProperties_url": {
+						"value": "[parameters('LS_ADLS_gg1adls3_properties_typeProperties_url')]"
+					},
+					"LS_DB_ggdb1source_properties_typeProperties_server": {
+						"value": "[parameters('LS_DB_ggdb1source_properties_typeProperties_server')]"
+					},
+					"LS_DB_ggdb1source_properties_typeProperties_database": {
+						"value": "[parameters('LS_DB_ggdb1source_properties_typeProperties_database')]"
+					},
+					"LS_DB_ggdb1source_properties_typeProperties_userName": {
+						"value": "[parameters('LS_DB_ggdb1source_properties_typeProperties_userName')]"
+					},
+					"LS_HttpServer_GitHub_properties_typeProperties_url": {
+						"value": "[parameters('LS_HttpServer_GitHub_properties_typeProperties_url')]"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "gg1adf31_ArmTemplate_1",
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2018-02-01",
+			"properties": {
+				"mode": "incremental",
+				"templateLink": {
+					"uri": "[concat(parameters('containerUri'), '/ArmTemplate_1.json', parameters('containerSasToken'))]",
+					"contentVersion": "1.0.0.0"
+				},
+				"parameters": {
+					"factoryName": {
+						"value": "[parameters('factoryName')]"
+					}
+				}
+			},
+			"dependsOn": [
+				"[resourceId('Microsoft.Resources/deployments', 'gg1adf31_ArmTemplate_0')]"
+			]
+		}
+	]
+}
