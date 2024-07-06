@@ -19,7 +19,7 @@
 						"type": "DelimitedTextSource",
 						"storeSettings": {
 							"type": "AzureBlobFSReadSettings",
-							"recursive": true,
+							"fileListPath": "adf1-source",
 							"enablePartitionDiscovery": false
 						},
 						"formatSettings": {
