@@ -68,8 +68,9 @@
 								"source": {
 									"type": "DelimitedTextSource",
 									"storeSettings": {
-										"type": "HttpReadSettings",
-										"requestMethod": "GET"
+										"type": "AzureBlobFSReadSettings",
+										"recursive": true,
+										"enablePartitionDiscovery": false
 									},
 									"formatSettings": {
 										"type": "DelimitedTextReadSettings"
@@ -88,14 +89,8 @@
 							},
 							"inputs": [
 								{
-									"referenceName": "DS_HTTP_GitHub",
-									"type": "DatasetReference",
-									"parameters": {
-										"filenameSource": {
-											"value": "@item().Files",
-											"type": "Expression"
-										}
-									}
+									"referenceName": "DS_ADLS_ListOfFiles_Source",
+									"type": "DatasetReference"
 								}
 							],
 							"outputs": [
