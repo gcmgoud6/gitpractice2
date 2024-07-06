@@ -129,6 +129,98 @@
 			"dependsOn": []
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/DS_ADLS_ListOfFiles_Source')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LS_ADLS_gg1adls3",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileSystem": "adf1-source"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "Match ID",
+						"type": "String"
+					},
+					{
+						"name": "Date",
+						"type": "String"
+					},
+					{
+						"name": "Venue",
+						"type": "String"
+					},
+					{
+						"name": "Team1",
+						"type": "String"
+					},
+					{
+						"name": "Team2",
+						"type": "String"
+					},
+					{
+						"name": "Toss Winner",
+						"type": "String"
+					},
+					{
+						"name": "Toss Decision",
+						"type": "String"
+					},
+					{
+						"name": "Stage",
+						"type": "String"
+					},
+					{
+						"name": "First Innings Score",
+						"type": "String"
+					},
+					{
+						"name": "First Innings Wicket",
+						"type": "String"
+					},
+					{
+						"name": "Second Innings score",
+						"type": "String"
+					},
+					{
+						"name": "Second Innings Wicket",
+						"type": "String"
+					},
+					{
+						"name": "Match Winner",
+						"type": "String"
+					},
+					{
+						"name": "Won by",
+						"type": "String"
+					},
+					{
+						"name": "Margin",
+						"type": "String"
+					},
+					{
+						"name": "Player of the match",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/LS_ADLS_gg1adls3')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/DS_ADLS_ListofFiles')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -628,7 +720,7 @@
 								"value": "@activity('Lookup list of files').output.value",
 								"type": "Expression"
 							},
-							"isSequential": true,
+							"isSequential": false,
 							"activities": [
 								{
 									"name": "Copy data IPL info",
@@ -646,8 +738,13 @@
 										"source": {
 											"type": "DelimitedTextSource",
 											"storeSettings": {
-												"type": "HttpReadSettings",
-												"requestMethod": "GET"
+												"type": "AzureBlobFSReadSettings",
+												"recursive": true,
+												"wildcardFileName": {
+													"value": "@item().Files",
+													"type": "Expression"
+												},
+												"enablePartitionDiscovery": false
 											},
 											"formatSettings": {
 												"type": "DelimitedTextReadSettings"
@@ -666,14 +763,9 @@
 									},
 									"inputs": [
 										{
-											"referenceName": "DS_HTTP_GitHub",
+											"referenceName": "DS_ADLS_ListOfFiles_Source",
 											"type": "DatasetReference",
-											"parameters": {
-												"filenameSource": {
-													"value": "@item().Files",
-													"type": "Expression"
-												}
-											}
+											"parameters": {}
 										}
 									],
 									"outputs": [
@@ -701,7 +793,7 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/DS_ADLS_ListofFiles')]",
-				"[concat(variables('factoryId'), '/datasets/DS_HTTP_GitHub')]",
+				"[concat(variables('factoryId'), '/datasets/DS_ADLS_ListOfFiles_Source')]",
 				"[concat(variables('factoryId'), '/datasets/DS_ADLS_gg1adls3')]"
 			]
 		},
@@ -883,156 +975,6 @@
 				"[concat(variables('factoryId'), '/datasets/DS_DB_ggdb1source_watermarktable')]",
 				"[concat(variables('factoryId'), '/datasets/DS_DB_ggdb1soruce_PurchaseOrders')]",
 				"[concat(variables('factoryId'), '/linkedServices/LS_DB_ggdb1source')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/PL_CopyFile_IfNotExist')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "Copyfile_Ifnotexist",
-						"type": "GetMetadata",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"dataset": {
-								"referenceName": "DS_Storage_gg1storage3_Target_Dynamic",
-								"type": "DatasetReference",
-								"parameters": {
-									"DS_Filename_Target": {
-										"value": "@pipeline().parameters.PL_Filename",
-										"type": "Expression"
-									}
-								}
-							},
-							"fieldList": [
-								"exists"
-							],
-							"storeSettings": {
-								"type": "AzureBlobStorageReadSettings",
-								"recursive": true,
-								"enablePartitionDiscovery": false
-							},
-							"formatSettings": {
-								"type": "DelimitedTextReadSettings"
-							}
-						}
-					},
-					{
-						"name": "If_FileNotExist",
-						"type": "IfCondition",
-						"dependsOn": [
-							{
-								"activity": "Copyfile_Ifnotexist",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"expression": {
-								"value": "@activity('Copyfile_Ifnotexist').output.exists",
-								"type": "Expression"
-							},
-							"ifFalseActivities": [
-								{
-									"name": "Copy data1",
-									"type": "Copy",
-									"dependsOn": [],
-									"policy": {
-										"timeout": "0.12:00:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"source": {
-											"type": "DelimitedTextSource",
-											"storeSettings": {
-												"type": "AzureBlobStorageReadSettings",
-												"recursive": true,
-												"enablePartitionDiscovery": false
-											},
-											"formatSettings": {
-												"type": "DelimitedTextReadSettings"
-											}
-										},
-										"sink": {
-											"type": "DelimitedTextSink",
-											"storeSettings": {
-												"type": "AzureBlobStorageWriteSettings"
-											},
-											"formatSettings": {
-												"type": "DelimitedTextWriteSettings",
-												"quoteAllText": true,
-												"fileExtension": ".txt"
-											}
-										},
-										"enableStaging": false,
-										"translator": {
-											"type": "TabularTranslator",
-											"typeConversion": true,
-											"typeConversionSettings": {
-												"allowDataTruncation": true,
-												"treatBooleanAsNumber": false
-											}
-										}
-									},
-									"inputs": [
-										{
-											"referenceName": "DS_Storage_gg1storage3_Source_Dynamic",
-											"type": "DatasetReference",
-											"parameters": {
-												"DS_Filename": {
-													"value": "@pipeline().parameters.PL_Filename",
-													"type": "Expression"
-												}
-											}
-										}
-									],
-									"outputs": [
-										{
-											"referenceName": "DS_Storage_gg1storage3_Target_Dynamic",
-											"type": "DatasetReference",
-											"parameters": {
-												"DS_Filename_Target": {
-													"value": "@pipeline().parameters.PL_Filename",
-													"type": "Expression"
-												}
-											}
-										}
-									]
-								}
-							]
-						}
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {}
-				},
-				"parameters": {
-					"PL_Filename": {
-						"type": "string"
-					}
-				},
-				"annotations": [],
-				"lastPublishTime": "2024-05-25T15:43:21Z"
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/DS_Storage_gg1storage3_Target_Dynamic')]",
-				"[concat(variables('factoryId'), '/datasets/DS_Storage_gg1storage3_Source_Dynamic')]"
 			]
 		}
 	]
