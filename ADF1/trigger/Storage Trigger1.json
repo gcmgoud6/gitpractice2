@@ -1,0 +1,17 @@
+{
+	"name": "Storage Trigger1",
+	"properties": {
+		"annotations": [],
+		"runtimeState": "Stopped",
+		"pipelines": [],
+		"type": "ScheduleTrigger",
+		"typeProperties": {
+			"recurrence": {
+				"frequency": "Minute",
+				"interval": 15,
+				"startTime": "2024-07-13T17:53:00",
+				"timeZone": "India Standard Time"
+			}
+		}
+	}
+}
