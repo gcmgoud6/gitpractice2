@@ -42,6 +42,14 @@
 		"LS_HttpServer_GitHub_properties_typeProperties_url": {
 			"type": "string",
 			"defaultValue": "https://github.com/gcmgoud6/gitpractice2/tree/main/"
+		},
+		"trigger1_properties_PL_Copy_File_parameters_pl_containername": {
+			"type": "string",
+			"defaultValue": "adf1-soruce"
+		},
+		"trigger1_properties_typeProperties_scope": {
+			"type": "string",
+			"defaultValue": "/subscriptions/33f3d366-dc07-46ca-9b75-c7416ea070c8/resourceGroups/Storage_RG1/providers/Microsoft.Storage/storageAccounts/gg1adls3"
 		}
 	},
 	"variables": {
@@ -1567,6 +1575,39 @@
 				"[concat(variables('factoryId'), '/datasets/DS_Storage_gg1storage3_PurchaseOrders')]",
 				"[concat(variables('factoryId'), '/datasets/DS_Storage_gg1storage3_Customers')]",
 				"[concat(variables('factoryId'), '/datasets/DS_DB_ggdb1soruce_PurchaseOrders')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/trigger1')]",
+			"type": "Microsoft.DataFactory/factories/triggers",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"runtimeState": "Stopped",
+				"pipelines": [
+					{
+						"pipelineReference": {
+							"referenceName": "PL_Copy_File",
+							"type": "PipelineReference"
+						},
+						"parameters": {
+							"pl_containername": "[parameters('trigger1_properties_PL_Copy_File_parameters_pl_containername')]"
+						}
+					}
+				],
+				"type": "BlobEventsTrigger",
+				"typeProperties": {
+					"blobPathBeginsWith": "/adf1-source/blobs/",
+					"ignoreEmptyBlobs": true,
+					"scope": "[parameters('trigger1_properties_typeProperties_scope')]",
+					"events": [
+						"Microsoft.Storage.BlobCreated",
+						"Microsoft.Storage.BlobDeleted"
+					]
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/pipelines/PL_Copy_File')]"
 			]
 		}
 	]
