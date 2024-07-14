@@ -10,7 +10,7 @@
 					"type": "PipelineReference"
 				},
 				"parameters": {
-					"pl_containername": "adf1-soruce"
+					"pl_containername": "@triggerBody().folderPath"
 				}
 			}
 		],
