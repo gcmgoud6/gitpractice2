@@ -37,6 +37,12 @@
 		},
 		"trigger1_properties_typeProperties_scope": {
 			"value": "/subscriptions/33f3d366-dc07-46ca-9b75-c7416ea070c8/resourceGroups/Storage_RG1/providers/Microsoft.Storage/storageAccounts/gg1adls3"
+		},
+		"trigger2_properties_PL_Copyfile_Dynamic_parameters_PL_Filename": {
+			"value": "@triggerBody().fileName"
+		},
+		"trigger2_properties_typeProperties_scope": {
+			"value": "/subscriptions/33f3d366-dc07-46ca-9b75-c7416ea070c8/resourceGroups/Storage_RG1/providers/Microsoft.Storage/storageAccounts/gg1storage3"
 		}
 	}
 }
