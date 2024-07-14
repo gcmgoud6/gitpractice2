@@ -1,0 +1,28 @@
+{
+	"name": "trigger2",
+	"properties": {
+		"annotations": [],
+		"runtimeState": "Started",
+		"pipelines": [
+			{
+				"pipelineReference": {
+					"referenceName": "PL_Copyfile_Dynamic",
+					"type": "PipelineReference"
+				},
+				"parameters": {
+					"PL_Filename": "@triggerBody().fileName"
+				}
+			}
+		],
+		"type": "BlobEventsTrigger",
+		"typeProperties": {
+			"blobPathBeginsWith": "/adf-source/blobs/",
+			"ignoreEmptyBlobs": true,
+			"scope": "/subscriptions/33f3d366-dc07-46ca-9b75-c7416ea070c8/resourceGroups/Storage_RG1/providers/Microsoft.Storage/storageAccounts/gg1storage3",
+			"events": [
+				"Microsoft.Storage.BlobCreated",
+				"Microsoft.Storage.BlobDeleted"
+			]
+		}
+	}
+}
