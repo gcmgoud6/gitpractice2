@@ -33,7 +33,7 @@
 			"value": "https://github.com/gcmgoud6/gitpractice2/tree/main/"
 		},
 		"trigger1_properties_PL_Copy_File_parameters_pl_containername": {
-			"value": "adf1-soruce"
+			"value": "@triggerBody().fileName"
 		},
 		"trigger1_properties_typeProperties_scope": {
 			"value": "/subscriptions/33f3d366-dc07-46ca-9b75-c7416ea070c8/resourceGroups/Storage_RG1/providers/Microsoft.Storage/storageAccounts/gg1adls3"

@@ -45,7 +45,7 @@
 		},
 		"trigger1_properties_PL_Copy_File_parameters_pl_containername": {
 			"type": "string",
-			"defaultValue": "adf1-soruce"
+			"defaultValue": "@triggerBody().fileName"
 		},
 		"trigger1_properties_typeProperties_scope": {
 			"type": "string",
