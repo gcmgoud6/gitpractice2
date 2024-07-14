@@ -9,7 +9,7 @@
 		},
 		"trigger1_properties_PL_Copy_File_parameters_pl_containername": {
 			"type": "string",
-			"defaultValue": "@triggerBody().fileName"
+			"defaultValue": "@triggerBody().folderPath"
 		},
 		"trigger1_properties_typeProperties_scope": {
 			"type": "string",
@@ -701,6 +701,7 @@
 				"type": "BlobEventsTrigger",
 				"typeProperties": {
 					"blobPathBeginsWith": "/adf1-source/blobs/",
+					"blobPathEndsWith": ".csv",
 					"ignoreEmptyBlobs": true,
 					"scope": "[parameters('trigger1_properties_typeProperties_scope')]",
 					"events": [
