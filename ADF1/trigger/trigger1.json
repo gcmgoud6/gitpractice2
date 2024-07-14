@@ -10,13 +10,14 @@
 					"type": "PipelineReference"
 				},
 				"parameters": {
-					"pl_containername": "@triggerBody().fileName"
+					"pl_containername": "@triggerBody().folderPath"
 				}
 			}
 		],
 		"type": "BlobEventsTrigger",
 		"typeProperties": {
 			"blobPathBeginsWith": "/adf1-source/blobs/",
+			"blobPathEndsWith": ".csv",
 			"ignoreEmptyBlobs": true,
 			"scope": "/subscriptions/33f3d366-dc07-46ca-9b75-c7416ea070c8/resourceGroups/Storage_RG1/providers/Microsoft.Storage/storageAccounts/gg1adls3",
 			"events": [
