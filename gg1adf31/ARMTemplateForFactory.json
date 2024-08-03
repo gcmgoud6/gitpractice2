@@ -666,6 +666,82 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/PL_Copy_FilefromGithub')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Copy data1",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "DelimitedTextSource",
+								"storeSettings": {
+									"type": "HttpReadSettings",
+									"requestMethod": "GET"
+								},
+								"formatSettings": {
+									"type": "DelimitedTextReadSettings"
+								}
+							},
+							"sink": {
+								"type": "DelimitedTextSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								},
+								"formatSettings": {
+									"type": "DelimitedTextWriteSettings",
+									"quoteAllText": true,
+									"fileExtension": ".txt"
+								}
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "DS_HTTP_Github",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "DS_ADLS_gg1adls3_adf1input",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/DS_HTTP_Github')]",
+				"[concat(variables('factoryId'), '/datasets/DS_ADLS_gg1adls3_adf1input')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/PL_Copyfile_Dynamic')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
@@ -1290,14 +1366,79 @@
 				"typeProperties": {
 					"location": {
 						"type": "HttpServerLocation",
-						"relativeUrl": "ipl 2022.csv"
+						"relativeUrl": "ipl%202021.csv"
 					},
 					"columnDelimiter": ",",
 					"escapeChar": "\\",
 					"firstRowAsHeader": true,
 					"quoteChar": "\""
 				},
-				"schema": []
+				"schema": [
+					{
+						"name": "Match ID",
+						"type": "String"
+					},
+					{
+						"name": "Date",
+						"type": "String"
+					},
+					{
+						"name": "Venue",
+						"type": "String"
+					},
+					{
+						"name": "Team1",
+						"type": "String"
+					},
+					{
+						"name": "Team2",
+						"type": "String"
+					},
+					{
+						"name": "Toss Winner",
+						"type": "String"
+					},
+					{
+						"name": "Toss Decision",
+						"type": "String"
+					},
+					{
+						"name": "Stage",
+						"type": "String"
+					},
+					{
+						"name": "First Innings Score",
+						"type": "String"
+					},
+					{
+						"name": "First Innings Wicket",
+						"type": "String"
+					},
+					{
+						"name": "Second Innings score",
+						"type": "String"
+					},
+					{
+						"name": "Second Innings Wicket",
+						"type": "String"
+					},
+					{
+						"name": "Match Winner",
+						"type": "String"
+					},
+					{
+						"name": "Won by",
+						"type": "String"
+					},
+					{
+						"name": "Margin",
+						"type": "String"
+					},
+					{
+						"name": "Player of the match",
+						"type": "String"
+					}
+				]
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/linkedServices/LS_HttpServer_GitHub')]"
