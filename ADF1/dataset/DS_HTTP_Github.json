@@ -10,13 +10,78 @@
 		"typeProperties": {
 			"location": {
 				"type": "HttpServerLocation",
-				"relativeUrl": "ipl 2022.csv"
+				"relativeUrl": "ipl%202021.csv"
 			},
 			"columnDelimiter": ",",
 			"escapeChar": "\\",
 			"firstRowAsHeader": true,
 			"quoteChar": "\""
 		},
-		"schema": []
+		"schema": [
+			{
+				"name": "Match ID",
+				"type": "String"
+			},
+			{
+				"name": "Date",
+				"type": "String"
+			},
+			{
+				"name": "Venue",
+				"type": "String"
+			},
+			{
+				"name": "Team1",
+				"type": "String"
+			},
+			{
+				"name": "Team2",
+				"type": "String"
+			},
+			{
+				"name": "Toss Winner",
+				"type": "String"
+			},
+			{
+				"name": "Toss Decision",
+				"type": "String"
+			},
+			{
+				"name": "Stage",
+				"type": "String"
+			},
+			{
+				"name": "First Innings Score",
+				"type": "String"
+			},
+			{
+				"name": "First Innings Wicket",
+				"type": "String"
+			},
+			{
+				"name": "Second Innings score",
+				"type": "String"
+			},
+			{
+				"name": "Second Innings Wicket",
+				"type": "String"
+			},
+			{
+				"name": "Match Winner",
+				"type": "String"
+			},
+			{
+				"name": "Won by",
+				"type": "String"
+			},
+			{
+				"name": "Margin",
+				"type": "String"
+			},
+			{
+				"name": "Player of the match",
+				"type": "String"
+			}
+		]
 	}
 }
