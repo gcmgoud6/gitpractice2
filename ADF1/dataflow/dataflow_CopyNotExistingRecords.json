@@ -19,16 +19,21 @@
 					"name": "sourceDB"
 				}
 			],
-			"sinks": [],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "DS_DB_ggdb1source_Employee",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
 			"transformations": [
 				{
 					"name": "hashcolumnSource"
 				},
 				{
 					"name": "hashcolumnTarget"
-				},
-				{
-					"name": "unionSoruceandTarget"
 				},
 				{
 					"name": "OnlyNotExistingRecords"
@@ -56,12 +61,25 @@
 				"     format: 'table') ~> sourceDB",
 				"sourceADLS derive(hashcolumnSource = sha2(256, columns())) ~> hashcolumnSource",
 				"sourceDB derive(hashcolumnTarget = sha2(256, columns())) ~> hashcolumnTarget",
-				"OnlyNotExistingRecords union(byName: true)~> unionSoruceandTarget",
-				"hashcolumnSource, hashcolumnTarget join(hashcolumnSource == hashcolumnTarget,",
-				"     joinType:'left',",
-				"     matchType:'exact',",
-				"     ignoreSpaces: false,",
-				"     broadcast: 'auto')~> OnlyNotExistingRecords"
+				"hashcolumnSource, hashcolumnTarget exists(hashcolumnSource == hashcolumnTarget,",
+				"     negate:true,",
+				"     broadcast: 'auto')~> OnlyNotExistingRecords",
+				"OnlyNotExistingRecords sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          Name as string,",
+				"          Designation as string,",
+				"          BU as string,",
+				"          Salary as integer",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError') ~> sink1"
 			]
 		}
 	}
