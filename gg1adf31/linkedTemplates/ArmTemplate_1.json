@@ -29,6 +29,40 @@
 	},
 	"resources": [
 		{
+			"name": "[concat(parameters('factoryName'), '/DS_Storage_gg1storage3_Source_Dynamic')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LS_Storage_gg1storage3",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"DS_Filename": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"fileName": {
+							"value": "@dataset().DS_Filename",
+							"type": "Expression"
+						},
+						"container": "adf-source"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": []
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/DS_Storage_gg1storage3_Target_Dynamic')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -513,7 +547,8 @@
 				"lastPublishTime": "2024-05-25T15:43:21Z"
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/DS_Storage_gg1storage3_Target_Dynamic')]"
+				"[concat(variables('factoryId'), '/datasets/DS_Storage_gg1storage3_Target_Dynamic')]",
+				"[concat(variables('factoryId'), '/datasets/DS_Storage_gg1storage3_Source_Dynamic')]"
 			]
 		},
 		{
@@ -662,7 +697,7 @@
 						],
 						"outputs": [
 							{
-								"referenceName": "DS_ADLS_gg1adls3_adf1input",
+								"referenceName": "DS_ADLS_gg1adls3_adf1Input1",
 								"type": "DatasetReference",
 								"parameters": {}
 							}
@@ -759,7 +794,9 @@
 				"annotations": [],
 				"lastPublishTime": "2024-05-25T12:49:27Z"
 			},
-			"dependsOn": []
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/DS_Storage_gg1storage3_Source_Dynamic')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/dataflow_CopyNotExistingRecords')]",
