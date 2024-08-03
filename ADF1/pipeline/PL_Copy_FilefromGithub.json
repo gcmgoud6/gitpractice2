@@ -54,7 +54,7 @@
 				],
 				"outputs": [
 					{
-						"referenceName": "DS_ADLS_gg1adls3_adf1input",
+						"referenceName": "DS_ADLS_gg1adls3_adf1Input1",
 						"type": "DatasetReference"
 					}
 				]
