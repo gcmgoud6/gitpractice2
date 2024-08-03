@@ -41,7 +41,7 @@
 		},
 		"LS_HttpServer_GitHub_properties_typeProperties_url": {
 			"type": "string",
-			"defaultValue": "https://github.com/gcmgoud6/gitpractice2/tree/main/"
+			"defaultValue": "https://github.com/gcmgoud6/gitpractice2/raw/main/"
 		},
 		"trigger1_properties_PL_Copy_File_parameters_pl_containername": {
 			"type": "string",

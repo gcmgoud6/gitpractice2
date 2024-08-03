@@ -41,7 +41,7 @@
 		},
 		"LS_HttpServer_GitHub_properties_typeProperties_url": {
 			"type": "string",
-			"defaultValue": "https://github.com/gcmgoud6/gitpractice2/tree/main/"
+			"defaultValue": "https://github.com/gcmgoud6/gitpractice2/raw/main/"
 		},
 		"trigger1_properties_PL_Copy_File_parameters_pl_containername": {
 			"type": "string",
@@ -1277,7 +1277,7 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/DS_HTTP_GitHub')]",
+			"name": "[concat(parameters('factoryName'), '/DS_HTTP_Github')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
 			"properties": {
@@ -1285,20 +1285,12 @@
 					"referenceName": "LS_HttpServer_GitHub",
 					"type": "LinkedServiceReference"
 				},
-				"parameters": {
-					"filenameSource": {
-						"type": "string"
-					}
-				},
 				"annotations": [],
 				"type": "DelimitedText",
 				"typeProperties": {
 					"location": {
 						"type": "HttpServerLocation",
-						"relativeUrl": {
-							"value": "@dataset().filenameSource",
-							"type": "Expression"
-						}
+						"relativeUrl": "ipl 2022.csv"
 					},
 					"columnDelimiter": ",",
 					"escapeChar": "\\",
