@@ -1116,6 +1116,45 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/DS_DB_ggdb1source_Employee')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LS_DB_ggdb1source",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "Name",
+						"type": "varchar"
+					},
+					{
+						"name": "Designation",
+						"type": "varchar"
+					},
+					{
+						"name": "BU",
+						"type": "varchar"
+					},
+					{
+						"name": "Salary",
+						"type": "int",
+						"precision": 10
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "Employee"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/LS_DB_ggdb1source')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/DS_DB_ggdb1source_orders')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -1581,6 +1620,98 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/pipelines/PL_Copyfile_Dynamic')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/dataflow_CopyNotExistingRecords')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "DS_ADLS_gg1adls3_adf1input",
+								"type": "DatasetReference"
+							},
+							"name": "sourceADLS"
+						},
+						{
+							"dataset": {
+								"referenceName": "DS_DB_ggdb1source_Employee",
+								"type": "DatasetReference"
+							},
+							"name": "sourceDB"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "DS_DB_ggdb1source_Employee",
+								"type": "DatasetReference"
+							},
+							"name": "sink1"
+						}
+					],
+					"transformations": [
+						{
+							"name": "hashcolumnSource"
+						},
+						{
+							"name": "hashcolumnTarget"
+						},
+						{
+							"name": "OnlyNotExistingRecords"
+						}
+					],
+					"scriptLines": [
+						"source(output(",
+						"          Name as string,",
+						"          Designation as string,",
+						"          BU as string,",
+						"          Salary as integer",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     ignoreNoFilesFound: false) ~> sourceADLS",
+						"source(output(",
+						"          Name as string,",
+						"          Designation as string,",
+						"          BU as string,",
+						"          Salary as integer",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     isolationLevel: 'READ_UNCOMMITTED',",
+						"     format: 'table') ~> sourceDB",
+						"sourceADLS derive(hashcolumnSource = sha2(256, columns())) ~> hashcolumnSource",
+						"sourceDB derive(hashcolumnTarget = sha2(256, columns())) ~> hashcolumnTarget",
+						"hashcolumnSource, hashcolumnTarget exists(hashcolumnSource == hashcolumnTarget,",
+						"     negate:true,",
+						"     broadcast: 'auto')~> OnlyNotExistingRecords",
+						"OnlyNotExistingRecords sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     input(",
+						"          Name as string,",
+						"          Designation as string,",
+						"          BU as string,",
+						"          Salary as integer",
+						"     ),",
+						"     deletable:false,",
+						"     insertable:true,",
+						"     updateable:false,",
+						"     upsertable:false,",
+						"     format: 'table',",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true,",
+						"     errorHandlingOption: 'stopOnFirstError') ~> sink1"
+					]
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/DS_ADLS_gg1adls3_adf1input')]",
+				"[concat(variables('factoryId'), '/datasets/DS_DB_ggdb1source_Employee')]"
 			]
 		},
 		{

@@ -490,6 +490,45 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/DS_DB_ggdb1source_Employee')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LS_DB_ggdb1source",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "Name",
+						"type": "varchar"
+					},
+					{
+						"name": "Designation",
+						"type": "varchar"
+					},
+					{
+						"name": "BU",
+						"type": "varchar"
+					},
+					{
+						"name": "Salary",
+						"type": "int",
+						"precision": 10
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "Employee"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/LS_DB_ggdb1source')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/DS_DB_ggdb1source_orders')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -762,42 +801,6 @@
 							"type": "Expression"
 						},
 						"container": "adf-source"
-					},
-					"columnDelimiter": ",",
-					"escapeChar": "\\",
-					"firstRowAsHeader": true,
-					"quoteChar": "\""
-				},
-				"schema": []
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/LS_Storage_gg1storage3')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/DS_Storage_gg1storage3_Target_Dynamic')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "LS_Storage_gg1storage3",
-					"type": "LinkedServiceReference"
-				},
-				"parameters": {
-					"DS_Filename_Target": {
-						"type": "string"
-					}
-				},
-				"annotations": [],
-				"type": "DelimitedText",
-				"typeProperties": {
-					"location": {
-						"type": "AzureBlobStorageLocation",
-						"fileName": {
-							"value": "@dataset().DS_Filename_Target",
-							"type": "Expression"
-						},
-						"container": "adf-target"
 					},
 					"columnDelimiter": ",",
 					"escapeChar": "\\",
