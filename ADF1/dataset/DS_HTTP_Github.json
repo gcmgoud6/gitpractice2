@@ -1,0 +1,22 @@
+{
+	"name": "DS_HTTP_Github",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "LS_HttpServer_GitHub",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "HttpServerLocation",
+				"relativeUrl": "ipl 2022.csv"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": []
+	}
+}
