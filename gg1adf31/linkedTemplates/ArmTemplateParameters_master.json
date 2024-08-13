@@ -17,6 +17,9 @@
 		"LS_Storage_gg1storage3_connectionString": {
 			"value": ""
 		},
+		"AzureKeyVault1_properties_typeProperties_baseUrl": {
+			"value": "https://keyVaultgg1.vault.azure.net/"
+		},
 		"LS_ADLS_gg1adls3_properties_typeProperties_url": {
 			"value": "https://gg1adls3.dfs.core.windows.net/"
 		},

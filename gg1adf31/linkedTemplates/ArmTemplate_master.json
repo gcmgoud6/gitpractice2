@@ -23,6 +23,10 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'LS_Storage_gg1storage3'"
 		},
+		"AzureKeyVault1_properties_typeProperties_baseUrl": {
+			"type": "string",
+			"defaultValue": "https://keyVaultgg1.vault.azure.net/"
+		},
 		"LS_ADLS_gg1adls3_properties_typeProperties_url": {
 			"type": "string",
 			"defaultValue": "https://gg1adls3.dfs.core.windows.net/"
@@ -97,6 +101,9 @@
 					},
 					"LS_Storage_gg1storage3_connectionString": {
 						"value": "[parameters('LS_Storage_gg1storage3_connectionString')]"
+					},
+					"AzureKeyVault1_properties_typeProperties_baseUrl": {
+						"value": "[parameters('AzureKeyVault1_properties_typeProperties_baseUrl')]"
 					},
 					"LS_ADLS_gg1adls3_properties_typeProperties_url": {
 						"value": "[parameters('LS_ADLS_gg1adls3_properties_typeProperties_url')]"
