@@ -29,6 +29,49 @@
 	},
 	"resources": [
 		{
+			"name": "[concat(parameters('factoryName'), '/DS_Storage_gg1storage3_Customers')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LS_Storage_gg1storage3",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"fileName": "Customer.txt",
+						"container": "adf-source"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "CustomerCode",
+						"type": "String"
+					},
+					{
+						"name": "CustomerName",
+						"type": "String"
+					},
+					{
+						"name": "Address",
+						"type": "String"
+					},
+					{
+						"name": "PhoneNumber",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/DS_Storage_gg1storage3_PurchaseOrders')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -718,11 +761,11 @@
 									"userProperties": [],
 									"typeProperties": {
 										"dataset": {
-											"referenceName": "DS_ADLS_gg1adls1_adf_input1dynamic",
+											"referenceName": "DS_ADLS_gg1adls1_dynamicBinary",
 											"type": "DatasetReference",
 											"parameters": {
 												"ds_filename": {
-													"value": "variables('sv_filename')",
+													"value": "@variables('sv_filename')",
 													"type": "Expression"
 												}
 											}
@@ -736,7 +779,7 @@
 											"enablePartitionDiscovery": false
 										},
 										"formatSettings": {
-											"type": "DelimitedTextReadSettings"
+											"type": "BinaryReadSettings"
 										}
 									}
 								},
@@ -755,6 +798,92 @@
 											"value": "@item().name",
 											"type": "Expression"
 										}
+									}
+								},
+								{
+									"name": "If File greterthen 10kb",
+									"type": "IfCondition",
+									"dependsOn": [
+										{
+											"activity": "size of each flle",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"userProperties": [],
+									"typeProperties": {
+										"expression": {
+											"value": "@greaterOrEquals(activity('size of each flle').output.size,200)",
+											"type": "Expression"
+										},
+										"ifTrueActivities": [
+											{
+												"name": "Copy data1",
+												"type": "Copy",
+												"dependsOn": [],
+												"policy": {
+													"timeout": "0.12:00:00",
+													"retry": 0,
+													"retryIntervalInSeconds": 30,
+													"secureOutput": false,
+													"secureInput": false
+												},
+												"userProperties": [],
+												"typeProperties": {
+													"source": {
+														"type": "DelimitedTextSource",
+														"storeSettings": {
+															"type": "AzureBlobFSReadSettings",
+															"recursive": true,
+															"enablePartitionDiscovery": false
+														},
+														"formatSettings": {
+															"type": "DelimitedTextReadSettings"
+														}
+													},
+													"sink": {
+														"type": "DelimitedTextSink",
+														"storeSettings": {
+															"type": "AzureBlobFSWriteSettings"
+														},
+														"formatSettings": {
+															"type": "DelimitedTextWriteSettings",
+															"quoteAllText": true,
+															"fileExtension": ".txt"
+														}
+													},
+													"enableStaging": false,
+													"translator": {
+														"type": "TabularTranslator",
+														"typeConversion": true,
+														"typeConversionSettings": {
+															"allowDataTruncation": true,
+															"treatBooleanAsNumber": false
+														}
+													}
+												},
+												"inputs": [
+													{
+														"referenceName": "DS_ADLS_gg1adls1_adf_input1dynamic",
+														"type": "DatasetReference",
+														"parameters": {
+															"ds_filename": {
+																"value": "@variables('sv_filename')",
+																"type": "Expression"
+															}
+														}
+													}
+												],
+												"outputs": [
+													{
+														"referenceName": "DS_ADLS_adf1_raw_Target",
+														"type": "DatasetReference",
+														"parameters": {}
+													}
+												]
+											}
+										]
 									}
 								}
 							]
@@ -1218,7 +1347,8 @@
 				}
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/DS_Storage_gg1storage3_PurchaseOrders')]"
+				"[concat(variables('factoryId'), '/datasets/DS_Storage_gg1storage3_PurchaseOrders')]",
+				"[concat(variables('factoryId'), '/datasets/DS_Storage_gg1storage3_Customers')]"
 			]
 		},
 		{

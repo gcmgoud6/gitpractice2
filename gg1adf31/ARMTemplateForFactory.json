@@ -609,11 +609,11 @@
 									"userProperties": [],
 									"typeProperties": {
 										"dataset": {
-											"referenceName": "DS_ADLS_gg1adls1_adf_input1dynamic",
+											"referenceName": "DS_ADLS_gg1adls1_dynamicBinary",
 											"type": "DatasetReference",
 											"parameters": {
 												"ds_filename": {
-													"value": "variables('sv_filename')",
+													"value": "@variables('sv_filename')",
 													"type": "Expression"
 												}
 											}
@@ -627,7 +627,7 @@
 											"enablePartitionDiscovery": false
 										},
 										"formatSettings": {
-											"type": "DelimitedTextReadSettings"
+											"type": "BinaryReadSettings"
 										}
 									}
 								},
@@ -647,6 +647,92 @@
 											"type": "Expression"
 										}
 									}
+								},
+								{
+									"name": "If File greterthen 10kb",
+									"type": "IfCondition",
+									"dependsOn": [
+										{
+											"activity": "size of each flle",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"userProperties": [],
+									"typeProperties": {
+										"expression": {
+											"value": "@greaterOrEquals(activity('size of each flle').output.size,200)",
+											"type": "Expression"
+										},
+										"ifTrueActivities": [
+											{
+												"name": "Copy data1",
+												"type": "Copy",
+												"dependsOn": [],
+												"policy": {
+													"timeout": "0.12:00:00",
+													"retry": 0,
+													"retryIntervalInSeconds": 30,
+													"secureOutput": false,
+													"secureInput": false
+												},
+												"userProperties": [],
+												"typeProperties": {
+													"source": {
+														"type": "DelimitedTextSource",
+														"storeSettings": {
+															"type": "AzureBlobFSReadSettings",
+															"recursive": true,
+															"enablePartitionDiscovery": false
+														},
+														"formatSettings": {
+															"type": "DelimitedTextReadSettings"
+														}
+													},
+													"sink": {
+														"type": "DelimitedTextSink",
+														"storeSettings": {
+															"type": "AzureBlobFSWriteSettings"
+														},
+														"formatSettings": {
+															"type": "DelimitedTextWriteSettings",
+															"quoteAllText": true,
+															"fileExtension": ".txt"
+														}
+													},
+													"enableStaging": false,
+													"translator": {
+														"type": "TabularTranslator",
+														"typeConversion": true,
+														"typeConversionSettings": {
+															"allowDataTruncation": true,
+															"treatBooleanAsNumber": false
+														}
+													}
+												},
+												"inputs": [
+													{
+														"referenceName": "DS_ADLS_gg1adls1_adf_input1dynamic",
+														"type": "DatasetReference",
+														"parameters": {
+															"ds_filename": {
+																"value": "@variables('sv_filename')",
+																"type": "Expression"
+															}
+														}
+													}
+												],
+												"outputs": [
+													{
+														"referenceName": "DS_ADLS_adf1_raw_Target",
+														"type": "DatasetReference",
+														"parameters": {}
+													}
+												]
+											}
+										]
+									}
 								}
 							]
 						}
@@ -664,7 +750,9 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/DS_ADLS_gg1adls3_adf1Input1')]",
-				"[concat(variables('factoryId'), '/datasets/DS_ADLS_gg1adls1_adf_input1dynamic')]"
+				"[concat(variables('factoryId'), '/datasets/DS_ADLS_gg1adls1_dynamicBinary')]",
+				"[concat(variables('factoryId'), '/datasets/DS_ADLS_gg1adls1_adf_input1dynamic')]",
+				"[concat(variables('factoryId'), '/datasets/DS_ADLS_adf1_raw_Target')]"
 			]
 		},
 		{
@@ -1312,6 +1400,37 @@
 						"type": "String"
 					}
 				]
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/LS_ADLS_gg1adls3')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DS_ADLS_gg1adls1_dynamicBinary')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LS_ADLS_gg1adls3",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"ds_filename": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "Binary",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": {
+							"value": "@dataset().ds_filename",
+							"type": "Expression"
+						},
+						"fileSystem": "adf1-input"
+					}
+				}
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/linkedServices/LS_ADLS_gg1adls3')]"
