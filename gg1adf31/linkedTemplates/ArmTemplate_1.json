@@ -6,22 +6,6 @@
 			"type": "string",
 			"metadata": "Data Factory name",
 			"defaultValue": "gg1adf31"
-		},
-		"trigger1_properties_PL_Copy_File_parameters_pl_containername": {
-			"type": "string",
-			"defaultValue": "@triggerBody().folderPath"
-		},
-		"trigger1_properties_typeProperties_scope": {
-			"type": "string",
-			"defaultValue": "/subscriptions/33f3d366-dc07-46ca-9b75-c7416ea070c8/resourceGroups/Storage_RG1/providers/Microsoft.Storage/storageAccounts/gg1adls3"
-		},
-		"trigger2_properties_PL_Copyfile_Dynamic_parameters_PL_Filename": {
-			"type": "string",
-			"defaultValue": "@triggerBody().fileName"
-		},
-		"trigger2_properties_typeProperties_scope": {
-			"type": "string",
-			"defaultValue": "/subscriptions/33f3d366-dc07-46ca-9b75-c7416ea070c8/resourceGroups/Storage_RG1/providers/Microsoft.Storage/storageAccounts/gg1storage3"
 		}
 	},
 	"variables": {
@@ -29,21 +13,39 @@
 	},
 	"resources": [
 		{
-			"name": "[concat(parameters('factoryName'), '/DS_Storage_gg1storage3_Customers')]",
+			"name": "[concat(parameters('factoryName'), '/DS_DB_ggdb1source_watermarktable')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"linkedServiceName": {
-					"referenceName": "LS_Storage_gg1storage3",
+					"referenceName": "LS_DB_ggdb1source",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "watermarktable"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DS_HTTP_Github')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LS_HttpServer_GitHub",
 					"type": "LinkedServiceReference"
 				},
 				"annotations": [],
 				"type": "DelimitedText",
 				"typeProperties": {
 					"location": {
-						"type": "AzureBlobStorageLocation",
-						"fileName": "Customer.txt",
-						"container": "adf-source"
+						"type": "HttpServerLocation",
+						"relativeUrl": "ipl%202021.csv"
 					},
 					"columnDelimiter": ",",
 					"escapeChar": "\\",
@@ -52,19 +54,67 @@
 				},
 				"schema": [
 					{
-						"name": "CustomerCode",
+						"name": "Match ID",
 						"type": "String"
 					},
 					{
-						"name": "CustomerName",
+						"name": "Date",
 						"type": "String"
 					},
 					{
-						"name": "Address",
+						"name": "Venue",
 						"type": "String"
 					},
 					{
-						"name": "PhoneNumber",
+						"name": "Team1",
+						"type": "String"
+					},
+					{
+						"name": "Team2",
+						"type": "String"
+					},
+					{
+						"name": "Toss Winner",
+						"type": "String"
+					},
+					{
+						"name": "Toss Decision",
+						"type": "String"
+					},
+					{
+						"name": "Stage",
+						"type": "String"
+					},
+					{
+						"name": "First Innings Score",
+						"type": "String"
+					},
+					{
+						"name": "First Innings Wicket",
+						"type": "String"
+					},
+					{
+						"name": "Second Innings score",
+						"type": "String"
+					},
+					{
+						"name": "Second Innings Wicket",
+						"type": "String"
+					},
+					{
+						"name": "Match Winner",
+						"type": "String"
+					},
+					{
+						"name": "Won by",
+						"type": "String"
+					},
+					{
+						"name": "Margin",
+						"type": "String"
+					},
+					{
+						"name": "Player of the match",
 						"type": "String"
 					}
 				]
@@ -72,72 +122,21 @@
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/DS_Storage_gg1storage3_PurchaseOrders')]",
+			"name": "[concat(parameters('factoryName'), '/DS_Target_DistictRows')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"linkedServiceName": {
-					"referenceName": "LS_Storage_gg1storage3",
+					"referenceName": "LS_ADLS_gg1adls3",
 					"type": "LinkedServiceReference"
 				},
 				"annotations": [],
 				"type": "DelimitedText",
 				"typeProperties": {
 					"location": {
-						"type": "AzureBlobStorageLocation",
-						"fileName": "Purchaseorder.txt",
-						"container": "adf-source"
-					},
-					"columnDelimiter": ",",
-					"escapeChar": "\\",
-					"firstRowAsHeader": true,
-					"quoteChar": "\""
-				},
-				"schema": [
-					{
-						"name": "PurchaseOrderID",
-						"type": "String"
-					},
-					{
-						"name": "CustomerCode",
-						"type": "String"
-					},
-					{
-						"name": "ProductCode",
-						"type": "String"
-					},
-					{
-						"name": "PuchaseOrderDate",
-						"type": "String"
-					},
-					{
-						"name": "Quantity",
-						"type": "String"
-					},
-					{
-						"name": "UnitPrice",
-						"type": "String"
-					}
-				]
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/DS_Storage_gg1storage3_Source')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "LS_Storage_gg1storage3",
-					"type": "LinkedServiceReference"
-				},
-				"annotations": [],
-				"type": "DelimitedText",
-				"typeProperties": {
-					"location": {
-						"type": "AzureBlobStorageLocation",
-						"fileName": "Students.txt",
-						"container": "adf-source"
+						"type": "AzureBlobFSLocation",
+						"fileName": "Employee.csv",
+						"fileSystem": "adf1-input"
 					},
 					"columnDelimiter": ",",
 					"escapeChar": "\\",
@@ -150,82 +149,14 @@
 						"type": "String"
 					},
 					{
-						"name": "GRADE",
+						"name": "Designation",
 						"type": "String"
 					},
 					{
-						"name": "MARKS",
+						"name": "Salary",
 						"type": "String"
 					}
 				]
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/DS_Storage_gg1storage3_Source_Dynamic')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "LS_Storage_gg1storage3",
-					"type": "LinkedServiceReference"
-				},
-				"parameters": {
-					"DS_Filename": {
-						"type": "string"
-					}
-				},
-				"annotations": [],
-				"type": "DelimitedText",
-				"typeProperties": {
-					"location": {
-						"type": "AzureBlobStorageLocation",
-						"fileName": {
-							"value": "@dataset().DS_Filename",
-							"type": "Expression"
-						},
-						"container": "adf-source"
-					},
-					"columnDelimiter": ",",
-					"escapeChar": "\\",
-					"firstRowAsHeader": true,
-					"quoteChar": "\""
-				},
-				"schema": []
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/DS_Storage_gg1storage3_Target_Dynamic')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "LS_Storage_gg1storage3",
-					"type": "LinkedServiceReference"
-				},
-				"parameters": {
-					"DS_Filename_Target": {
-						"type": "string"
-					}
-				},
-				"annotations": [],
-				"type": "DelimitedText",
-				"typeProperties": {
-					"location": {
-						"type": "AzureBlobStorageLocation",
-						"fileName": {
-							"value": "@dataset().DS_Filename_Target",
-							"type": "Expression"
-						},
-						"container": "adf-target"
-					},
-					"columnDelimiter": ",",
-					"escapeChar": "\\",
-					"firstRowAsHeader": true,
-					"quoteChar": "\""
-				},
-				"schema": []
 			},
 			"dependsOn": []
 		},
@@ -358,331 +289,6 @@
 				"lastPublishTime": "2023-06-24T11:35:20Z"
 			},
 			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/PL_Copy data from source to target table incrementally')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "LKP_newWatermakTableOutput",
-						"type": "Lookup",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "AzureSqlSource",
-								"sqlReaderQuery": "select max(lastModifytime) as newWatermarkValue from orders;",
-								"queryTimeout": "02:00:00",
-								"partitionOption": "None"
-							},
-							"dataset": {
-								"referenceName": "DS_DB_ggdb1source_orders",
-								"type": "DatasetReference",
-								"parameters": {}
-							}
-						}
-					},
-					{
-						"name": "LKP_oldWatermarkTableOutput",
-						"type": "Lookup",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "AzureSqlSource",
-								"sqlReaderQuery": "select TableName, WatermarkValue as oldWatermarkValue from watermarktable;",
-								"queryTimeout": "02:00:00",
-								"partitionOption": "None"
-							},
-							"dataset": {
-								"referenceName": "DS_DB_ggdb1source_watermarktable",
-								"type": "DatasetReference",
-								"parameters": {}
-							}
-						}
-					},
-					{
-						"name": "Copy data1",
-						"type": "Copy",
-						"dependsOn": [
-							{
-								"activity": "LKP_newWatermakTableOutput",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							},
-							{
-								"activity": "LKP_oldWatermarkTableOutput",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "AzureSqlSource",
-								"sqlReaderQuery": {
-									"value": "select * from orders where LastModifytime > '@{activity('LKP_oldWatermarkTableOutput').output.firstRow.oldWatermarkValue}' and LastModifytime <= '@{activity('LKP_newWatermakTableOutput').output.firstRow.newWatermarkValue}'",
-									"type": "Expression"
-								},
-								"queryTimeout": "02:00:00",
-								"partitionOption": "None"
-							},
-							"sink": {
-								"type": "AzureSqlSink",
-								"writeBehavior": "insert",
-								"sqlWriterUseTableLock": false
-							},
-							"enableStaging": false,
-							"translator": {
-								"type": "TabularTranslator",
-								"typeConversion": true,
-								"typeConversionSettings": {
-									"allowDataTruncation": true,
-									"treatBooleanAsNumber": false
-								}
-							}
-						},
-						"inputs": [
-							{
-								"referenceName": "DS_DB_ggdb1source_orders",
-								"type": "DatasetReference",
-								"parameters": {}
-							}
-						],
-						"outputs": [
-							{
-								"referenceName": "DS_DB_ggdb1soruce_PurchaseOrders",
-								"type": "DatasetReference",
-								"parameters": {}
-							}
-						]
-					},
-					{
-						"name": "SP_UpdateWatermarkTable",
-						"type": "SqlServerStoredProcedure",
-						"dependsOn": [
-							{
-								"activity": "Copy data1",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"storedProcedureName": "[[dbo].[usp_write_watermark]",
-							"storedProcedureParameters": {
-								"LastModifiedtime": {
-									"value": {
-										"value": "@activity('LKP_newWatermakTableOutput').output.firstRow.newWatermarkValue",
-										"type": "Expression"
-									},
-									"type": "DateTime"
-								},
-								"TableName": {
-									"value": {
-										"value": "@activity('LKP_oldWatermarkTableOutput').output.firstRow.TableName",
-										"type": "Expression"
-									},
-									"type": "String"
-								}
-							}
-						},
-						"linkedServiceName": {
-							"referenceName": "LS_DB_ggdb1source",
-							"type": "LinkedServiceReference"
-						}
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {}
-				},
-				"annotations": [],
-				"lastPublishTime": "2024-06-08T15:33:38Z"
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/PL_CopyFile_IfNotExist')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "Copyfile_Ifnotexist",
-						"type": "GetMetadata",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"dataset": {
-								"referenceName": "DS_Storage_gg1storage3_Target_Dynamic",
-								"type": "DatasetReference",
-								"parameters": {
-									"DS_Filename_Target": {
-										"value": "@pipeline().parameters.PL_Filename",
-										"type": "Expression"
-									}
-								}
-							},
-							"fieldList": [
-								"exists"
-							],
-							"storeSettings": {
-								"type": "AzureBlobStorageReadSettings",
-								"recursive": true,
-								"enablePartitionDiscovery": false
-							},
-							"formatSettings": {
-								"type": "DelimitedTextReadSettings"
-							}
-						}
-					},
-					{
-						"name": "If_FileNotExist",
-						"type": "IfCondition",
-						"dependsOn": [
-							{
-								"activity": "Copyfile_Ifnotexist",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"expression": {
-								"value": "@activity('Copyfile_Ifnotexist').output.exists",
-								"type": "Expression"
-							},
-							"ifFalseActivities": [
-								{
-									"name": "Copy data1",
-									"type": "Copy",
-									"dependsOn": [],
-									"policy": {
-										"timeout": "0.12:00:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"source": {
-											"type": "DelimitedTextSource",
-											"storeSettings": {
-												"type": "AzureBlobStorageReadSettings",
-												"recursive": true,
-												"enablePartitionDiscovery": false
-											},
-											"formatSettings": {
-												"type": "DelimitedTextReadSettings"
-											}
-										},
-										"sink": {
-											"type": "DelimitedTextSink",
-											"storeSettings": {
-												"type": "AzureBlobStorageWriteSettings"
-											},
-											"formatSettings": {
-												"type": "DelimitedTextWriteSettings",
-												"quoteAllText": true,
-												"fileExtension": ".txt"
-											}
-										},
-										"enableStaging": false,
-										"translator": {
-											"type": "TabularTranslator",
-											"typeConversion": true,
-											"typeConversionSettings": {
-												"allowDataTruncation": true,
-												"treatBooleanAsNumber": false
-											}
-										}
-									},
-									"inputs": [
-										{
-											"referenceName": "DS_Storage_gg1storage3_Source_Dynamic",
-											"type": "DatasetReference",
-											"parameters": {
-												"DS_Filename": {
-													"value": "@pipeline().parameters.PL_Filename",
-													"type": "Expression"
-												}
-											}
-										}
-									],
-									"outputs": [
-										{
-											"referenceName": "DS_Storage_gg1storage3_Target_Dynamic",
-											"type": "DatasetReference",
-											"parameters": {
-												"DS_Filename_Target": {
-													"value": "@pipeline().parameters.PL_Filename",
-													"type": "Expression"
-												}
-											}
-										}
-									]
-								}
-							]
-						}
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {}
-				},
-				"parameters": {
-					"PL_Filename": {
-						"type": "string"
-					}
-				},
-				"annotations": [],
-				"lastPublishTime": "2024-05-25T15:43:21Z"
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/DS_Storage_gg1storage3_Target_Dynamic')]",
-				"[concat(variables('factoryId'), '/datasets/DS_Storage_gg1storage3_Source_Dynamic')]"
-			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/PL_CopyFilesGreterThen10Kb')]",
@@ -903,93 +509,6 @@
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/PL_Copy_File')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "Copy All Files",
-						"type": "Copy",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "DelimitedTextSource",
-								"storeSettings": {
-									"type": "AzureBlobFSReadSettings",
-									"recursive": true,
-									"wildcardFileName": "*.csv",
-									"enablePartitionDiscovery": false
-								},
-								"formatSettings": {
-									"type": "DelimitedTextReadSettings"
-								}
-							},
-							"sink": {
-								"type": "DelimitedTextSink",
-								"storeSettings": {
-									"type": "AzureBlobFSWriteSettings"
-								},
-								"formatSettings": {
-									"type": "DelimitedTextWriteSettings",
-									"quoteAllText": true,
-									"fileExtension": ".txt"
-								}
-							},
-							"enableStaging": false,
-							"translator": {
-								"type": "TabularTranslator",
-								"typeConversion": true,
-								"typeConversionSettings": {
-									"allowDataTruncation": true,
-									"treatBooleanAsNumber": false
-								}
-							}
-						},
-						"inputs": [
-							{
-								"referenceName": "DS_ADLS_ListOfFiles_Dynamic",
-								"type": "DatasetReference",
-								"parameters": {
-									"ds_containdername": {
-										"value": "@pipeline().parameters.pl_containername",
-										"type": "Expression"
-									}
-								}
-							}
-						],
-						"outputs": [
-							{
-								"referenceName": "DS_ADLS_adf1_raw_Target",
-								"type": "DatasetReference",
-								"parameters": {}
-							}
-						]
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {}
-				},
-				"parameters": {
-					"pl_containername": {
-						"type": "string",
-						"defaultValue": "adf1-source"
-					}
-				},
-				"annotations": [],
-				"lastPublishTime": "2024-05-25T12:18:44Z"
-			},
-			"dependsOn": []
-		},
-		{
 			"name": "[concat(parameters('factoryName'), '/PL_Copy_FilefromGithub')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
@@ -1060,93 +579,93 @@
 				},
 				"annotations": []
 			},
-			"dependsOn": []
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/DS_HTTP_Github')]"
+			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/PL_Copyfile_Dynamic')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
+			"name": "[concat(parameters('factoryName'), '/DF_Remove_Duplicates')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
 			"apiVersion": "2018-06-01",
 			"properties": {
-				"activities": [
-					{
-						"name": "Copy file Dynamic",
-						"type": "Copy",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.00:30:00",
-							"retry": 1,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "DelimitedTextSource",
-								"storeSettings": {
-									"type": "AzureBlobStorageReadSettings",
-									"recursive": true,
-									"enablePartitionDiscovery": false
-								},
-								"formatSettings": {
-									"type": "DelimitedTextReadSettings"
-								}
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "DS_ADLS_gg1adls3_employee",
+								"type": "DatasetReference"
 							},
-							"sink": {
-								"type": "DelimitedTextSink",
-								"storeSettings": {
-									"type": "AzureBlobFSWriteSettings"
-								},
-								"formatSettings": {
-									"type": "DelimitedTextWriteSettings",
-									"quoteAllText": true,
-									"fileExtension": ".txt"
-								}
-							},
-							"enableStaging": false,
-							"translator": {
-								"type": "TabularTranslator",
-								"typeConversion": true,
-								"typeConversionSettings": {
-									"allowDataTruncation": true,
-									"treatBooleanAsNumber": false
-								}
-							}
+							"name": "Employee"
 						},
-						"inputs": [
-							{
-								"referenceName": "DS_Storage_gg1storage3_Source_Dynamic",
-								"type": "DatasetReference",
-								"parameters": {
-									"DS_Filename": {
-										"value": "@pipeline().parameters.PL_Filename",
-										"type": "Expression"
-									}
-								}
-							}
-						],
-						"outputs": [
-							{
-								"referenceName": "DS_ADLS_adf1_raw_Target",
-								"type": "DatasetReference",
-								"parameters": {}
-							}
-						]
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {}
-				},
-				"parameters": {
-					"PL_Filename": {
-						"type": "string"
-					}
-				},
-				"annotations": [],
-				"lastPublishTime": "2024-05-25T12:49:27Z"
+						{
+							"dataset": {
+								"referenceName": "DS_ADLS_gg1adls3_employee2",
+								"type": "DatasetReference"
+							},
+							"name": "Employee1"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "DS_Target_DistictRows",
+								"type": "DatasetReference"
+							},
+							"name": "EmployeeDistinctRows"
+						}
+					],
+					"transformations": [
+						{
+							"name": "AllRowsOfEmployee"
+						},
+						{
+							"name": "aggregate1"
+						},
+						{
+							"name": "sort1"
+						}
+					],
+					"scriptLines": [
+						"source(output(",
+						"          {EMP-ID} as string,",
+						"          Name as string,",
+						"          Designation as string,",
+						"          Salary as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     ignoreNoFilesFound: false) ~> Employee",
+						"source(output(",
+						"          {EMP-ID} as string,",
+						"          Name as string,",
+						"          Designation as string,",
+						"          Salary as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     ignoreNoFilesFound: false) ~> Employee1",
+						"Employee, Employee1 union(byName: true)~> AllRowsOfEmployee",
+						"AllRowsOfEmployee aggregate(groupBy({EMP-ID}),",
+						"     each(match(name!='EMP-ID'), $$ = first($$))) ~> aggregate1",
+						"aggregate1 sort(asc({EMP-ID}, true)) ~> sort1",
+						"sort1 sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     input(",
+						"          Name as string,",
+						"          Designation as string,",
+						"          Salary as string",
+						"     ),",
+						"     umask: 0022,",
+						"     preCommands: [],",
+						"     postCommands: [],",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> EmployeeDistinctRows"
+					]
+				}
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/DS_Storage_gg1storage3_Source_Dynamic')]"
+				"[concat(variables('factoryId'), '/datasets/DS_Target_DistictRows')]"
 			]
 		},
 		{
@@ -1239,119 +758,6 @@
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/dataflow_purchaseordersquantity')]",
-			"type": "Microsoft.DataFactory/factories/dataflows",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"type": "MappingDataFlow",
-				"typeProperties": {
-					"sources": [
-						{
-							"dataset": {
-								"referenceName": "DS_Storage_gg1storage3_PurchaseOrders",
-								"type": "DatasetReference"
-							},
-							"name": "PurchaseOrders"
-						},
-						{
-							"dataset": {
-								"referenceName": "DS_Storage_gg1storage3_Customers",
-								"type": "DatasetReference"
-							},
-							"name": "Customers"
-						}
-					],
-					"sinks": [
-						{
-							"dataset": {
-								"referenceName": "DS_DB_ggdb1soruce_PurchaseOrders",
-								"type": "DatasetReference"
-							},
-							"name": "OutputCustomersPuchasedQuantity"
-						}
-					],
-					"transformations": [
-						{
-							"name": "PurchaseOrdersProjected"
-						},
-						{
-							"name": "DataQuantity"
-						},
-						{
-							"name": "CustomersProjected"
-						},
-						{
-							"name": "CustomersPurchasedQuantity"
-						}
-					],
-					"scriptLines": [
-						"source(output(",
-						"          PurchaseOrderID as string,",
-						"          CustomerCode as integer,",
-						"          ProductCode as string,",
-						"          PuchaseOrderDate as string,",
-						"          Quantity as integer,",
-						"          UnitPrice as string",
-						"     ),",
-						"     allowSchemaDrift: true,",
-						"     validateSchema: false,",
-						"     ignoreNoFilesFound: false) ~> PurchaseOrders",
-						"source(output(",
-						"          CustomerCode as integer,",
-						"          CustomerName as string,",
-						"          Address as string,",
-						"          PhoneNumber as string",
-						"     ),",
-						"     allowSchemaDrift: true,",
-						"     validateSchema: false,",
-						"     ignoreNoFilesFound: false) ~> Customers",
-						"PurchaseOrders select(mapColumn(",
-						"          CustomerCode,",
-						"          Quantity",
-						"     ),",
-						"     skipDuplicateMapInputs: true,",
-						"     skipDuplicateMapOutputs: true) ~> PurchaseOrdersProjected",
-						"PurchaseOrdersProjected filter(greater(Quantity, 0)) ~> DataQuantity",
-						"Customers select(mapColumn(",
-						"          CustomerCode,",
-						"          CustomerName",
-						"     ),",
-						"     skipDuplicateMapInputs: true,",
-						"     skipDuplicateMapOutputs: true) ~> CustomersProjected",
-						"DataQuantity, CustomersProjected join(PurchaseOrdersProjected@CustomerCode == CustomersProjected@CustomerCode,",
-						"     joinType:'inner',",
-						"     matchType:'exact',",
-						"     ignoreSpaces: false,",
-						"     broadcast: 'auto')~> CustomersPurchasedQuantity",
-						"CustomersPurchasedQuantity sink(allowSchemaDrift: true,",
-						"     validateSchema: false,",
-						"     input(",
-						"          customer_code as integer,",
-						"          customer_name as string,",
-						"          Purchases as integer",
-						"     ),",
-						"     deletable:false,",
-						"     insertable:true,",
-						"     updateable:false,",
-						"     upsertable:false,",
-						"     format: 'table',",
-						"     skipDuplicateMapInputs: true,",
-						"     skipDuplicateMapOutputs: true,",
-						"     errorHandlingOption: 'stopOnFirstError',",
-						"     mapColumn(",
-						"          customer_code = PurchaseOrdersProjected@CustomerCode,",
-						"          customer_name = CustomerName,",
-						"          Purchases = Quantity",
-						"     )) ~> OutputCustomersPuchasedQuantity"
-					]
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/DS_Storage_gg1storage3_PurchaseOrders')]",
-				"[concat(variables('factoryId'), '/datasets/DS_Storage_gg1storage3_Customers')]"
-			]
-		},
-		{
 			"name": "[concat(parameters('factoryName'), '/PL_CopyNotExistingRecords')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
@@ -1399,13 +805,13 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/PL_Dataflow_PurchaseProductsQuantity')]",
+			"name": "[concat(parameters('factoryName'), '/PL_Remove duplicate rows')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"activities": [
 					{
-						"name": "Dataflow_PurchaseProductsQuantity",
+						"name": "Data flow1",
 						"type": "ExecuteDataFlow",
 						"dependsOn": [],
 						"policy": {
@@ -1418,13 +824,13 @@
 						"userProperties": [],
 						"typeProperties": {
 							"dataflow": {
-								"referenceName": "dataflow_purchaseordersquantity",
+								"referenceName": "DF_Remove_Duplicates",
 								"type": "DataFlowReference",
 								"parameters": {},
 								"datasetParameters": {
-									"PurchaseOrders": {},
-									"Customers": {},
-									"OutputCustomersPuchasedQuantity": {}
+									"Employee": {},
+									"Employee1": {},
+									"EmployeeDistinctRows": {}
 								}
 							},
 							"staging": {},
@@ -1439,78 +845,10 @@
 				"policy": {
 					"elapsedTimeMetric": {}
 				},
-				"annotations": [],
-				"lastPublishTime": "2024-06-08T15:58:08Z"
+				"annotations": []
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/dataflows/dataflow_purchaseordersquantity')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/trigger1')]",
-			"type": "Microsoft.DataFactory/factories/triggers",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"runtimeState": "Started",
-				"pipelines": [
-					{
-						"pipelineReference": {
-							"referenceName": "PL_Copy_File",
-							"type": "PipelineReference"
-						},
-						"parameters": {
-							"pl_containername": "[parameters('trigger1_properties_PL_Copy_File_parameters_pl_containername')]"
-						}
-					}
-				],
-				"type": "BlobEventsTrigger",
-				"typeProperties": {
-					"blobPathBeginsWith": "/adf1-source/blobs/",
-					"blobPathEndsWith": ".csv",
-					"ignoreEmptyBlobs": true,
-					"scope": "[parameters('trigger1_properties_typeProperties_scope')]",
-					"events": [
-						"Microsoft.Storage.BlobCreated",
-						"Microsoft.Storage.BlobDeleted"
-					]
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/pipelines/PL_Copy_File')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/trigger2')]",
-			"type": "Microsoft.DataFactory/factories/triggers",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"runtimeState": "Started",
-				"pipelines": [
-					{
-						"pipelineReference": {
-							"referenceName": "PL_Copyfile_Dynamic",
-							"type": "PipelineReference"
-						},
-						"parameters": {
-							"PL_Filename": "[parameters('trigger2_properties_PL_Copyfile_Dynamic_parameters_PL_Filename')]"
-						}
-					}
-				],
-				"type": "BlobEventsTrigger",
-				"typeProperties": {
-					"blobPathBeginsWith": "/adf-source/blobs/",
-					"ignoreEmptyBlobs": true,
-					"scope": "[parameters('trigger2_properties_typeProperties_scope')]",
-					"events": [
-						"Microsoft.Storage.BlobCreated",
-						"Microsoft.Storage.BlobDeleted"
-					]
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/pipelines/PL_Copyfile_Dynamic')]"
+				"[concat(variables('factoryId'), '/dataflows/DF_Remove_Duplicates')]"
 			]
 		}
 	]

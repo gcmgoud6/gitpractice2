@@ -47,22 +47,6 @@
 			"type": "string",
 			"defaultValue": "https://github.com/gcmgoud6/gitpractice2/raw/main/"
 		},
-		"trigger1_properties_PL_Copy_File_parameters_pl_containername": {
-			"type": "string",
-			"defaultValue": "@triggerBody().folderPath"
-		},
-		"trigger1_properties_typeProperties_scope": {
-			"type": "string",
-			"defaultValue": "/subscriptions/33f3d366-dc07-46ca-9b75-c7416ea070c8/resourceGroups/Storage_RG1/providers/Microsoft.Storage/storageAccounts/gg1adls3"
-		},
-		"trigger2_properties_PL_Copyfile_Dynamic_parameters_PL_Filename": {
-			"type": "string",
-			"defaultValue": "@triggerBody().fileName"
-		},
-		"trigger2_properties_typeProperties_scope": {
-			"type": "string",
-			"defaultValue": "/subscriptions/33f3d366-dc07-46ca-9b75-c7416ea070c8/resourceGroups/Storage_RG1/providers/Microsoft.Storage/storageAccounts/gg1storage3"
-		},
 		"containerUri": {
 			"type": "string",
 			"metadata": "URI to storage account containing linked ARM templates"
@@ -137,18 +121,6 @@
 				"parameters": {
 					"factoryName": {
 						"value": "[parameters('factoryName')]"
-					},
-					"trigger1_properties_PL_Copy_File_parameters_pl_containername": {
-						"value": "[parameters('trigger1_properties_PL_Copy_File_parameters_pl_containername')]"
-					},
-					"trigger1_properties_typeProperties_scope": {
-						"value": "[parameters('trigger1_properties_typeProperties_scope')]"
-					},
-					"trigger2_properties_PL_Copyfile_Dynamic_parameters_PL_Filename": {
-						"value": "[parameters('trigger2_properties_PL_Copyfile_Dynamic_parameters_PL_Filename')]"
-					},
-					"trigger2_properties_typeProperties_scope": {
-						"value": "[parameters('trigger2_properties_typeProperties_scope')]"
 					}
 				}
 			},
