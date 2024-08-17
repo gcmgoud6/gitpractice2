@@ -16,21 +16,14 @@
 				"userProperties": [],
 				"typeProperties": {
 					"dataset": {
-						"referenceName": "DS_Storage_gg1storage3_Target_Dynamic",
-						"type": "DatasetReference",
-						"parameters": {
-							"DS_Filename_Target": {
-								"value": "@pipeline().parameters.PL_Filename",
-								"type": "Expression"
-							}
-						}
+						"referenceName": "DS_ADLS_gg1adls3_adf1Input1",
+						"type": "DatasetReference"
 					},
 					"fieldList": [
 						"exists"
 					],
 					"storeSettings": {
-						"type": "AzureBlobStorageReadSettings",
-						"recursive": true,
+						"type": "AzureBlobFSReadSettings",
 						"enablePartitionDiscovery": false
 					},
 					"formatSettings": {
@@ -91,40 +84,8 @@
 										"fileExtension": ".txt"
 									}
 								},
-								"enableStaging": false,
-								"translator": {
-									"type": "TabularTranslator",
-									"typeConversion": true,
-									"typeConversionSettings": {
-										"allowDataTruncation": true,
-										"treatBooleanAsNumber": false
-									}
-								}
-							},
-							"inputs": [
-								{
-									"referenceName": "DS_Storage_gg1storage3_Source_Dynamic",
-									"type": "DatasetReference",
-									"parameters": {
-										"DS_Filename": {
-											"value": "@pipeline().parameters.PL_Filename",
-											"type": "Expression"
-										}
-									}
-								}
-							],
-							"outputs": [
-								{
-									"referenceName": "DS_Storage_gg1storage3_Target_Dynamic",
-									"type": "DatasetReference",
-									"parameters": {
-										"DS_Filename_Target": {
-											"value": "@pipeline().parameters.PL_Filename",
-											"type": "Expression"
-										}
-									}
-								}
-							]
+								"enableStaging": false
+							}
 						}
 					]
 				}
