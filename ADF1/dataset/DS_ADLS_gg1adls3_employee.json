@@ -20,6 +20,10 @@
 		},
 		"schema": [
 			{
+				"name": "EMP-ID",
+				"type": "String"
+			},
+			{
 				"name": "Name",
 				"type": "String"
 			},

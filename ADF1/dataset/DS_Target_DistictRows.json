@@ -1,5 +1,5 @@
 {
-	"name": "DS_ADLS_gg1adls3_employee2",
+	"name": "DS_Target_DistictRows",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "LS_ADLS_gg1adls3",
@@ -10,7 +10,7 @@
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobFSLocation",
-				"fileName": "Employee2.csv",
+				"fileName": "Employee.csv",
 				"fileSystem": "adf1-input"
 			},
 			"columnDelimiter": ",",
@@ -19,10 +19,6 @@
 			"quoteChar": "\""
 		},
 		"schema": [
-			{
-				"name": "EMP-ID",
-				"type": "String"
-			},
 			{
 				"name": "Name",
 				"type": "String"
