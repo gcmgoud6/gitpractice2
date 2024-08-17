@@ -1,0 +1,50 @@
+{
+	"name": "DF_Remove_Duplicates",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "DS_ADLS_gg1adls3_employee",
+						"type": "DatasetReference"
+					},
+					"name": "Employee"
+				},
+				{
+					"dataset": {
+						"referenceName": "DS_ADLS_gg1adls3_employee2",
+						"type": "DatasetReference"
+					},
+					"name": "Employee1"
+				}
+			],
+			"sinks": [],
+			"transformations": [
+				{
+					"name": "AllRowsOfEmployee"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          Name as string,",
+				"          Designation as string,",
+				"          Salary as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> Employee",
+				"source(output(",
+				"          Name as string,",
+				"          Designation as string,",
+				"          Salary as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> Employee1",
+				"Employee, Employee1 union(byName: true,",
+				"     partitionBy('roundRobin', 2))~> AllRowsOfEmployee"
+			]
+		}
+	}
+}
