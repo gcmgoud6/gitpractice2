@@ -1,0 +1,23 @@
+{
+	"name": "DS_Target_Distinct_Rows",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "LS_ADLS_gg1adls3",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": "employee.csv",
+				"fileSystem": "adf1-input"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": []
+	}
+}
