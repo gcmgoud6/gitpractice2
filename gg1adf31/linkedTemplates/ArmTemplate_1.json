@@ -122,7 +122,7 @@
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/DS_Target_DistictRows')]",
+			"name": "[concat(parameters('factoryName'), '/DS_Target_Distinct_Rows')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
 			"properties": {
@@ -135,7 +135,7 @@
 				"typeProperties": {
 					"location": {
 						"type": "AzureBlobFSLocation",
-						"fileName": "Employee.csv",
+						"fileName": "employee.csv",
 						"fileSystem": "adf1-input"
 					},
 					"columnDelimiter": ",",
@@ -143,20 +143,7 @@
 					"firstRowAsHeader": true,
 					"quoteChar": "\""
 				},
-				"schema": [
-					{
-						"name": "Name",
-						"type": "String"
-					},
-					{
-						"name": "Designation",
-						"type": "String"
-					},
-					{
-						"name": "Salary",
-						"type": "String"
-					}
-				]
+				"schema": []
 			},
 			"dependsOn": []
 		},
@@ -609,7 +596,7 @@
 					"sinks": [
 						{
 							"dataset": {
-								"referenceName": "DS_Target_DistictRows",
+								"referenceName": "DS_Target_Distinct_Rows",
 								"type": "DatasetReference"
 							},
 							"name": "EmployeeDistinctRows"
@@ -651,11 +638,6 @@
 						"aggregate1 sort(asc({EMP-ID}, true)) ~> sort1",
 						"sort1 sink(allowSchemaDrift: true,",
 						"     validateSchema: false,",
-						"     input(",
-						"          Name as string,",
-						"          Designation as string,",
-						"          Salary as string",
-						"     ),",
 						"     umask: 0022,",
 						"     preCommands: [],",
 						"     postCommands: [],",
@@ -665,7 +647,67 @@
 				}
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/DS_Target_DistictRows')]"
+				"[concat(variables('factoryId'), '/datasets/DS_Target_Distinct_Rows')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DF_Remove_Duplicates_copy1')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "DS_ADLS_gg1adls3_adf1Input1",
+								"type": "DatasetReference"
+							},
+							"name": "Employee"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "DS_Target_Distinct_Rows",
+								"type": "DatasetReference"
+							},
+							"name": "EmployeeDistinctRows"
+						}
+					],
+					"transformations": [
+						{
+							"name": "aggregate1"
+						},
+						{
+							"name": "sort1"
+						}
+					],
+					"scriptLines": [
+						"source(output(",
+						"          {EMP-ID} as short,",
+						"          Name as string,",
+						"          Designation as string,",
+						"          Salary as integer",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     ignoreNoFilesFound: false) ~> Employee",
+						"Employee aggregate(groupBy({EMP-ID}),",
+						"     each(match(name!='EMP-ID'), $$ = first($$))) ~> aggregate1",
+						"aggregate1 sort(asc({EMP-ID}, true)) ~> sort1",
+						"sort1 sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     umask: 0022,",
+						"     preCommands: [],",
+						"     postCommands: [],",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> EmployeeDistinctRows"
+					]
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/DS_Target_Distinct_Rows')]"
 			]
 		},
 		{
