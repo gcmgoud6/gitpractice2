@@ -1698,6 +1698,37 @@
 				"[concat(variables('factoryId'), '/datasets/DS_ADLS_gg1adls3_adf1input')]",
 				"[concat(variables('factoryId'), '/datasets/DS_DB_ggdb1source_Employee')]"
 			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/trigger1')]",
+			"type": "Microsoft.DataFactory/factories/triggers",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"runtimeState": "Stopped",
+				"pipelines": [
+					{
+						"pipelineReference": {
+							"referenceName": "PL_Copy All IPL files",
+							"type": "PipelineReference"
+						},
+						"parameters": {}
+					}
+				],
+				"type": "ScheduleTrigger",
+				"typeProperties": {
+					"recurrence": {
+						"frequency": "Day",
+						"interval": 1,
+						"startTime": "2024-08-24T17:00:00",
+						"timeZone": "India Standard Time",
+						"schedule": {}
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/pipelines/PL_Copy All IPL files')]"
+			]
 		}
 	]
 }
