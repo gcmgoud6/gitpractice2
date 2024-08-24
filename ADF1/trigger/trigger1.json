@@ -3,13 +3,20 @@
 	"properties": {
 		"annotations": [],
 		"runtimeState": "Started",
-		"pipelines": [],
+		"pipelines": [
+			{
+				"pipelineReference": {
+					"referenceName": "PL_Copy All IPL files",
+					"type": "PipelineReference"
+				}
+			}
+		],
 		"type": "ScheduleTrigger",
 		"typeProperties": {
 			"recurrence": {
 				"frequency": "Day",
 				"interval": 7,
-				"startTime": "2024-08-24T17:05:00",
+				"startTime": "2024-08-24T17:07:00",
 				"timeZone": "India Standard Time"
 			}
 		}
