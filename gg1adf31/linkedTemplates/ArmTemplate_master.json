@@ -11,21 +11,9 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'accountKey' of 'LS_ADLS_gg1adls3'"
 		},
-		"LS_DB_ggdb1soruce_Dataflow_connectionString": {
-			"type": "secureString",
-			"metadata": "Secure string for 'connectionString' of 'LS_DB_ggdb1soruce_Dataflow'"
-		},
 		"LS_DB_ggdb1source_password": {
 			"type": "secureString",
 			"metadata": "Secure string for 'password' of 'LS_DB_ggdb1source'"
-		},
-		"LS_Storage_gg1storage3_connectionString": {
-			"type": "secureString",
-			"metadata": "Secure string for 'connectionString' of 'LS_Storage_gg1storage3'"
-		},
-		"AzureKeyVault1_properties_typeProperties_baseUrl": {
-			"type": "string",
-			"defaultValue": "https://keyVaultgg1.vault.azure.net/"
 		},
 		"LS_ADLS_gg1adls3_properties_typeProperties_url": {
 			"type": "string",
@@ -43,7 +31,7 @@
 			"type": "string",
 			"defaultValue": "ggouddbserver"
 		},
-		"LS_HttpServer_GitHub_properties_typeProperties_url": {
+		"LS_HTTP_GIT_gcmgoud_properties_typeProperties_url": {
 			"type": "string",
 			"defaultValue": "https://github.com/gcmgoud6/gitpractice2/raw/main/"
 		},
@@ -77,17 +65,8 @@
 					"LS_ADLS_gg1adls3_accountKey": {
 						"value": "[parameters('LS_ADLS_gg1adls3_accountKey')]"
 					},
-					"LS_DB_ggdb1soruce_Dataflow_connectionString": {
-						"value": "[parameters('LS_DB_ggdb1soruce_Dataflow_connectionString')]"
-					},
 					"LS_DB_ggdb1source_password": {
 						"value": "[parameters('LS_DB_ggdb1source_password')]"
-					},
-					"LS_Storage_gg1storage3_connectionString": {
-						"value": "[parameters('LS_Storage_gg1storage3_connectionString')]"
-					},
-					"AzureKeyVault1_properties_typeProperties_baseUrl": {
-						"value": "[parameters('AzureKeyVault1_properties_typeProperties_baseUrl')]"
 					},
 					"LS_ADLS_gg1adls3_properties_typeProperties_url": {
 						"value": "[parameters('LS_ADLS_gg1adls3_properties_typeProperties_url')]"
@@ -101,8 +80,8 @@
 					"LS_DB_ggdb1source_properties_typeProperties_userName": {
 						"value": "[parameters('LS_DB_ggdb1source_properties_typeProperties_userName')]"
 					},
-					"LS_HttpServer_GitHub_properties_typeProperties_url": {
-						"value": "[parameters('LS_HttpServer_GitHub_properties_typeProperties_url')]"
+					"LS_HTTP_GIT_gcmgoud_properties_typeProperties_url": {
+						"value": "[parameters('LS_HTTP_GIT_gcmgoud_properties_typeProperties_url')]"
 					}
 				}
 			},
