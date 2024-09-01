@@ -191,6 +191,107 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/DS_ADLS_gg1adls3_adf1_input_orders')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LS_ADLS_gg1adls3",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "orders1.csv",
+						"fileSystem": "adf1-input"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "orderid",
+						"type": "String"
+					},
+					{
+						"name": "itemname ",
+						"type": "String"
+					},
+					{
+						"name": "price_of_item",
+						"type": "String"
+					},
+					{
+						"name": "quantity",
+						"type": "String"
+					},
+					{
+						"name": "total_cost",
+						"type": "String"
+					},
+					{
+						"name": "LastModifytime datetime",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/LS_ADLS_gg1adls3')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DS_DB_ggdb1source_orders')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LS_DB_ggdb1source",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "orderid",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "itemname",
+						"type": "varchar"
+					},
+					{
+						"name": "price_of_item",
+						"type": "decimal",
+						"precision": 10,
+						"scale": 2
+					},
+					{
+						"name": "quantity",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "total_cost",
+						"type": "decimal",
+						"precision": 10,
+						"scale": 2
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "orders"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/LS_DB_ggdb1source')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/CopyListofFilesfromGit')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
@@ -324,6 +425,148 @@
 				"[concat(variables('factoryId'), '/datasets/DS_ADLS_gg1adls3_ListofFiles')]",
 				"[concat(variables('factoryId'), '/datasets/DS_GIT_allFiles')]",
 				"[concat(variables('factoryId'), '/datasets/DS_ADLS_gg1adls3_forGit')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/CopyNotExistingRecords')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "DS_ADLS_gg1adls3_adf1_input_orders",
+								"type": "DatasetReference"
+							},
+							"name": "AdlsSourceOrders"
+						},
+						{
+							"dataset": {
+								"referenceName": "DS_DB_ggdb1source_orders",
+								"type": "DatasetReference"
+							},
+							"name": "dbSoruceOrders"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "DS_DB_ggdb1source_orders",
+								"type": "DatasetReference"
+							},
+							"name": "sink1"
+						}
+					],
+					"transformations": [
+						{
+							"name": "HashColumnforAdlsOrders"
+						},
+						{
+							"name": "HashColumnforDbOrders"
+						},
+						{
+							"name": "exists1"
+						}
+					],
+					"scriptLines": [
+						"source(output(",
+						"          orderid as integer,",
+						"          {itemname } as string,",
+						"          price_of_item as decimal(10,0),",
+						"          quantity as integer,",
+						"          total_cost as decimal(10,0)",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     ignoreNoFilesFound: false) ~> AdlsSourceOrders",
+						"source(output(",
+						"          orderid as integer,",
+						"          itemname as string,",
+						"          price_of_item as decimal(10,2),",
+						"          quantity as integer,",
+						"          total_cost as decimal(10,2)",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     isolationLevel: 'READ_UNCOMMITTED',",
+						"     format: 'table') ~> dbSoruceOrders",
+						"AdlsSourceOrders derive(HashColumn = sha2(256,orderid)) ~> HashColumnforAdlsOrders",
+						"dbSoruceOrders derive(HashColumn = sha2(256,orderid)) ~> HashColumnforDbOrders",
+						"HashColumnforAdlsOrders, HashColumnforDbOrders exists(HashColumnforAdlsOrders@HashColumn == HashColumnforDbOrders@HashColumn,",
+						"     negate:true,",
+						"     broadcast: 'auto')~> exists1",
+						"exists1 sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     input(",
+						"          orderid as integer,",
+						"          itemname as string,",
+						"          price_of_item as decimal(10,2),",
+						"          quantity as integer,",
+						"          total_cost as decimal(10,2)",
+						"     ),",
+						"     deletable:false,",
+						"     insertable:true,",
+						"     updateable:false,",
+						"     upsertable:false,",
+						"     format: 'table',",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true,",
+						"     errorHandlingOption: 'stopOnFirstError') ~> sink1"
+					]
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/DS_ADLS_gg1adls3_adf1_input_orders')]",
+				"[concat(variables('factoryId'), '/datasets/DS_DB_ggdb1source_orders')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/CopyNotExistingRecords')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "tocopynotexistingrecords",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "CopyNotExistingRecords",
+								"type": "DataFlowReference",
+								"parameters": {},
+								"datasetParameters": {
+									"AdlsSourceOrders": {},
+									"dbSoruceOrders": {},
+									"sink1": {}
+								}
+							},
+							"staging": {},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							},
+							"traceLevel": "Fine"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/dataflows/CopyNotExistingRecords')]"
 			]
 		}
 	]
