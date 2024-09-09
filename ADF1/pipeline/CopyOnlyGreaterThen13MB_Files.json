@@ -68,7 +68,7 @@
 							}
 						},
 						{
-							"name": "ToGetSizeofFile",
+							"name": "Get Metadata2",
 							"type": "GetMetadata",
 							"dependsOn": [
 								{
@@ -85,11 +85,7 @@
 								"secureOutput": false,
 								"secureInput": false
 							},
-							"userProperties": [
-								{
-									"name": ""
-								}
-							],
+							"userProperties": [],
 							"typeProperties": {
 								"dataset": {
 									"referenceName": "DS_ADLS_adf1_raw_ToGetSizeOfFile",
@@ -118,7 +114,7 @@
 							"type": "IfCondition",
 							"dependsOn": [
 								{
-									"activity": "ToGetSizeofFile",
+									"activity": "Get Metadata2",
 									"dependencyConditions": [
 										"Succeeded"
 									]
@@ -127,7 +123,7 @@
 							"userProperties": [],
 							"typeProperties": {
 								"expression": {
-									"value": "@greaterOrEquals(activity('ToGetSizeofFile').output.size,13000)",
+									"value": "@greaterOrEquals(activity('Get Metadata2').output.size,13000)",
 									"type": "Expression"
 								},
 								"ifTrueActivities": [
