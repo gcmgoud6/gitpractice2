@@ -82,7 +82,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"pipeline": {
-						"referenceName": "pipeline2",
+						"referenceName": "PL_Delete old Files",
 						"type": "PipelineReference"
 					},
 					"waitOnCompletion": true
