@@ -15,6 +15,10 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'password' of 'LS_DB_ggdb1source'"
 		},
+		"LS_Storage_gg1storage3_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'LS_Storage_gg1storage3'"
+		},
 		"LS_ADLS_gg1adls3_properties_typeProperties_url": {
 			"type": "string",
 			"defaultValue": "https://gg1adls3.dfs.core.windows.net/"
@@ -51,7 +55,7 @@
 		{
 			"name": "gg1adf31_ArmTemplate_0",
 			"type": "Microsoft.Resources/deployments",
-			"apiVersion": "2018-02-01",
+			"apiVersion": "2024-03-01",
 			"properties": {
 				"mode": "incremental",
 				"templateLink": {
@@ -67,6 +71,9 @@
 					},
 					"LS_DB_ggdb1source_password": {
 						"value": "[parameters('LS_DB_ggdb1source_password')]"
+					},
+					"LS_Storage_gg1storage3_connectionString": {
+						"value": "[parameters('LS_Storage_gg1storage3_connectionString')]"
 					},
 					"LS_ADLS_gg1adls3_properties_typeProperties_url": {
 						"value": "[parameters('LS_ADLS_gg1adls3_properties_typeProperties_url')]"
