@@ -3,86 +3,11 @@
 	"properties": {
 		"type": "MappingDataFlow",
 		"typeProperties": {
-			"sources": [
-				{
-					"dataset": {
-						"referenceName": "DS_ADLS_gg1adls3_adf1_input_orders",
-						"type": "DatasetReference"
-					},
-					"name": "AdlsSourceOrders"
-				},
-				{
-					"dataset": {
-						"referenceName": "DS_DB_ggdb1source_orders",
-						"type": "DatasetReference"
-					},
-					"name": "dbSoruceOrders"
-				}
-			],
-			"sinks": [
-				{
-					"dataset": {
-						"referenceName": "DS_DB_ggdb1source_orders",
-						"type": "DatasetReference"
-					},
-					"name": "sink1"
-				}
-			],
-			"transformations": [
-				{
-					"name": "HashColumnforAdlsOrders"
-				},
-				{
-					"name": "HashColumnforDbOrders"
-				},
-				{
-					"name": "exists1"
-				}
-			],
+			"sources": [],
+			"sinks": [],
+			"transformations": [],
 			"scriptLines": [
-				"source(output(",
-				"          orderid as integer,",
-				"          {itemname } as string,",
-				"          price_of_item as decimal(10,0),",
-				"          quantity as integer,",
-				"          total_cost as decimal(10,0)",
-				"     ),",
-				"     allowSchemaDrift: true,",
-				"     validateSchema: false,",
-				"     ignoreNoFilesFound: false) ~> AdlsSourceOrders",
-				"source(output(",
-				"          orderid as integer,",
-				"          itemname as string,",
-				"          price_of_item as decimal(10,2),",
-				"          quantity as integer,",
-				"          total_cost as decimal(10,2)",
-				"     ),",
-				"     allowSchemaDrift: true,",
-				"     validateSchema: false,",
-				"     isolationLevel: 'READ_UNCOMMITTED',",
-				"     format: 'table') ~> dbSoruceOrders",
-				"AdlsSourceOrders derive(HashColumn = sha2(256,orderid)) ~> HashColumnforAdlsOrders",
-				"dbSoruceOrders derive(HashColumn = sha2(256,orderid)) ~> HashColumnforDbOrders",
-				"HashColumnforAdlsOrders, HashColumnforDbOrders exists(HashColumnforAdlsOrders@HashColumn == HashColumnforDbOrders@HashColumn,",
-				"     negate:true,",
-				"     broadcast: 'auto')~> exists1",
-				"exists1 sink(allowSchemaDrift: true,",
-				"     validateSchema: false,",
-				"     input(",
-				"          orderid as integer,",
-				"          itemname as string,",
-				"          price_of_item as decimal(10,2),",
-				"          quantity as integer,",
-				"          total_cost as decimal(10,2)",
-				"     ),",
-				"     deletable:false,",
-				"     insertable:true,",
-				"     updateable:false,",
-				"     upsertable:false,",
-				"     format: 'table',",
-				"     skipDuplicateMapInputs: true,",
-				"     skipDuplicateMapOutputs: true,",
-				"     errorHandlingOption: 'stopOnFirstError') ~> sink1"
+				""
 			]
 		}
 	}
