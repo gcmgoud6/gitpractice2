@@ -3,11 +3,83 @@
 	"properties": {
 		"type": "MappingDataFlow",
 		"typeProperties": {
-			"sources": [],
-			"sinks": [],
-			"transformations": [],
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "DS_ADLS_adf1_source_employee",
+						"type": "DatasetReference"
+					},
+					"name": "adlsInputEmployee"
+				},
+				{
+					"dataset": {
+						"referenceName": "DS_DB_ggdb1source_employee",
+						"type": "DatasetReference"
+					},
+					"name": "dbInputEmployee"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "DS_DB_ggdb1source_employee",
+						"type": "DatasetReference"
+					},
+					"name": "sinkinDB"
+				}
+			],
+			"transformations": [
+				{
+					"name": "ForHashColumn1"
+				},
+				{
+					"name": "ForHashColumn2"
+				},
+				{
+					"name": "exists1"
+				}
+			],
 			"scriptLines": [
-				""
+				"source(output(",
+				"          Name as string,",
+				"          Designation as string,",
+				"          BU as string,",
+				"          Salary as integer",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> adlsInputEmployee",
+				"source(output(",
+				"          Name as string,",
+				"          Designation as string,",
+				"          BU as string,",
+				"          Salary as integer",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> dbInputEmployee",
+				"adlsInputEmployee derive(hashColumn1 = sha2(256,columns())) ~> ForHashColumn1",
+				"dbInputEmployee derive(hashcolumn2 = sha2(256,columns())) ~> ForHashColumn2",
+				"ForHashColumn1, ForHashColumn2 exists(hashColumn1 == hashcolumn2,",
+				"     negate:true,",
+				"     broadcast: 'auto')~> exists1",
+				"exists1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          Name as string,",
+				"          Designation as string,",
+				"          BU as string,",
+				"          Salary as integer",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError') ~> sinkinDB"
 			]
 		}
 	}
