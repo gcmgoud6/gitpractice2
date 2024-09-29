@@ -204,9 +204,9 @@
 								"type": "DataFlowReference",
 								"parameters": {},
 								"datasetParameters": {
-									"AdlsSourceOrders": {},
-									"dbSoruceOrders": {},
-									"sink1": {}
+									"adlsInputEmployee": {},
+									"dbInputEmployee": {},
+									"sinkinDB": {}
 								}
 							},
 							"staging": {},
@@ -538,7 +538,7 @@
 						"userProperties": [],
 						"typeProperties": {
 							"pipeline": {
-								"referenceName": "pipeline2",
+								"referenceName": "PL_Delete old Files",
 								"type": "PipelineReference"
 							},
 							"waitOnCompletion": true,
@@ -554,11 +554,11 @@
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/DS_Storage_gg1storage3')]",
 				"[concat(variables('factoryId'), '/datasets/DS_ADLS_adf1_output')]",
-				"[concat(variables('factoryId'), '/pipelines/pipeline2')]"
+				"[concat(variables('factoryId'), '/pipelines/PL_Delete old Files')]"
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/pipeline2')]",
+			"name": "[concat(parameters('factoryName'), '/PL_Delete old Files')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
 			"properties": {
@@ -694,6 +694,51 @@
 					"quoteChar": "\""
 				},
 				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/LS_ADLS_gg1adls3')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DS_ADLS_adf1_source_employee')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LS_ADLS_gg1adls3",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "Employee.csv",
+						"fileSystem": "adf1-source"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "Name",
+						"type": "String"
+					},
+					{
+						"name": "Designation",
+						"type": "String"
+					},
+					{
+						"name": "BU",
+						"type": "String"
+					},
+					{
+						"name": "Salary",
+						"type": "String"
+					}
+				]
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/linkedServices/LS_ADLS_gg1adls3')]"
@@ -837,6 +882,45 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/linkedServices/LS_ADLS_gg1adls3')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DS_DB_ggdb1source_employee')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LS_DB_ggdb1source",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "Name",
+						"type": "varchar"
+					},
+					{
+						"name": "Designation",
+						"type": "varchar"
+					},
+					{
+						"name": "BU",
+						"type": "varchar"
+					},
+					{
+						"name": "Salary",
+						"type": "int",
+						"precision": 10
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "Employee"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/LS_DB_ggdb1source')]"
 			]
 		},
 		{
@@ -1027,34 +1111,34 @@
 					"sources": [
 						{
 							"dataset": {
-								"referenceName": "DS_ADLS_gg1adls3_adf1_input_orders",
+								"referenceName": "DS_ADLS_adf1_source_employee",
 								"type": "DatasetReference"
 							},
-							"name": "AdlsSourceOrders"
+							"name": "adlsInputEmployee"
 						},
 						{
 							"dataset": {
-								"referenceName": "DS_DB_ggdb1source_orders",
+								"referenceName": "DS_DB_ggdb1source_employee",
 								"type": "DatasetReference"
 							},
-							"name": "dbSoruceOrders"
+							"name": "dbInputEmployee"
 						}
 					],
 					"sinks": [
 						{
 							"dataset": {
-								"referenceName": "DS_DB_ggdb1source_orders",
+								"referenceName": "DS_DB_ggdb1source_employee",
 								"type": "DatasetReference"
 							},
-							"name": "sink1"
+							"name": "sinkinDB"
 						}
 					],
 					"transformations": [
 						{
-							"name": "HashColumnforAdlsOrders"
+							"name": "ForHashColumn1"
 						},
 						{
-							"name": "HashColumnforDbOrders"
+							"name": "ForHashColumn2"
 						},
 						{
 							"name": "exists1"
@@ -1062,39 +1146,36 @@
 					],
 					"scriptLines": [
 						"source(output(",
-						"          orderid as integer,",
-						"          {itemname } as string,",
-						"          price_of_item as decimal(10,0),",
-						"          quantity as integer,",
-						"          total_cost as decimal(10,0)",
+						"          Name as string,",
+						"          Designation as string,",
+						"          BU as string,",
+						"          Salary as integer",
 						"     ),",
 						"     allowSchemaDrift: true,",
 						"     validateSchema: false,",
-						"     ignoreNoFilesFound: false) ~> AdlsSourceOrders",
+						"     ignoreNoFilesFound: false) ~> adlsInputEmployee",
 						"source(output(",
-						"          orderid as integer,",
-						"          itemname as string,",
-						"          price_of_item as decimal(10,2),",
-						"          quantity as integer,",
-						"          total_cost as decimal(10,2)",
+						"          Name as string,",
+						"          Designation as string,",
+						"          BU as string,",
+						"          Salary as integer",
 						"     ),",
 						"     allowSchemaDrift: true,",
 						"     validateSchema: false,",
 						"     isolationLevel: 'READ_UNCOMMITTED',",
-						"     format: 'table') ~> dbSoruceOrders",
-						"AdlsSourceOrders derive(HashColumn = sha2(256,orderid)) ~> HashColumnforAdlsOrders",
-						"dbSoruceOrders derive(HashColumn = sha2(256,orderid)) ~> HashColumnforDbOrders",
-						"HashColumnforAdlsOrders, HashColumnforDbOrders exists(HashColumnforAdlsOrders@HashColumn == HashColumnforDbOrders@HashColumn,",
+						"     format: 'table') ~> dbInputEmployee",
+						"adlsInputEmployee derive(hashColumn1 = sha2(256,columns())) ~> ForHashColumn1",
+						"dbInputEmployee derive(hashcolumn2 = sha2(256,columns())) ~> ForHashColumn2",
+						"ForHashColumn1, ForHashColumn2 exists(hashColumn1 == hashcolumn2,",
 						"     negate:true,",
 						"     broadcast: 'auto')~> exists1",
 						"exists1 sink(allowSchemaDrift: true,",
 						"     validateSchema: false,",
 						"     input(",
-						"          orderid as integer,",
-						"          itemname as string,",
-						"          price_of_item as decimal(10,2),",
-						"          quantity as integer,",
-						"          total_cost as decimal(10,2)",
+						"          Name as string,",
+						"          Designation as string,",
+						"          BU as string,",
+						"          Salary as integer",
 						"     ),",
 						"     deletable:false,",
 						"     insertable:true,",
@@ -1103,13 +1184,13 @@
 						"     format: 'table',",
 						"     skipDuplicateMapInputs: true,",
 						"     skipDuplicateMapOutputs: true,",
-						"     errorHandlingOption: 'stopOnFirstError') ~> sink1"
+						"     errorHandlingOption: 'stopOnFirstError') ~> sinkinDB"
 					]
 				}
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/DS_ADLS_gg1adls3_adf1_input_orders')]",
-				"[concat(variables('factoryId'), '/datasets/DS_DB_ggdb1source_orders')]"
+				"[concat(variables('factoryId'), '/datasets/DS_ADLS_adf1_source_employee')]",
+				"[concat(variables('factoryId'), '/datasets/DS_DB_ggdb1source_employee')]"
 			]
 		}
 	]
