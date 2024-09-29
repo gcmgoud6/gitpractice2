@@ -125,7 +125,6 @@
 				"typeProperties": {
 					"location": {
 						"type": "AzureBlobFSLocation",
-						"folderPath": "fromSA",
 						"fileSystem": "adf1-output"
 					},
 					"columnDelimiter": ",",
