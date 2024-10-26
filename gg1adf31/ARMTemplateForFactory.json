@@ -558,6 +558,52 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/PL_CopyDataWithOutDuplicates')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "ToCopyDistinctRows",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "DatawithoutDuplicates",
+								"type": "DataFlowReference",
+								"parameters": {},
+								"datasetParameters": {
+									"EmployeeData": {},
+									"sink1": {}
+								}
+							},
+							"staging": {},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							},
+							"traceLevel": "Fine"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/dataflows/DatawithoutDuplicates')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/PL_CopyFromCsvToSQL')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
@@ -803,6 +849,31 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/DS_ADLS_adf1_output_Employeenoduplicates')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LS_ADLS_gg1adls3",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Json",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "EmployeeNoduplicates",
+						"folderPath": "Jsonfiles",
+						"fileSystem": "adf1-output"
+					}
+				},
+				"schema": {}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/LS_ADLS_gg1adls3')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/DS_ADLS_adf1_raw_ToGetSizeOfFile')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -902,6 +973,51 @@
 					},
 					{
 						"name": "BU",
+						"type": "String"
+					},
+					{
+						"name": "Salary",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/LS_ADLS_gg1adls3')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DS_ADLS_adf_input_Employee1')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LS_ADLS_gg1adls3",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "Employee1.csv",
+						"fileSystem": "adf1-input"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "EMP-ID",
+						"type": "String"
+					},
+					{
+						"name": "Name",
+						"type": "String"
+					},
+					{
+						"name": "Designation",
 						"type": "String"
 					},
 					{
@@ -1443,6 +1559,68 @@
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/DS_ADLS_adf1_source_employee')]",
 				"[concat(variables('factoryId'), '/datasets/DS_DB_ggdb1source_employee')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DatawithoutDuplicates')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "DS_ADLS_adf_input_Employee1",
+								"type": "DatasetReference"
+							},
+							"name": "EmployeeData"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "DS_ADLS_adf1_output_Employeenoduplicates",
+								"type": "DatasetReference"
+							},
+							"name": "sink1"
+						}
+					],
+					"transformations": [
+						{
+							"name": "RemoveDuplicates"
+						},
+						{
+							"name": "sortOnEmpId"
+						}
+					],
+					"scriptLines": [
+						"source(output(",
+						"          {EMP-ID} as string,",
+						"          Name as string,",
+						"          Designation as string,",
+						"          Salary as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     ignoreNoFilesFound: false) ~> EmployeeData",
+						"EmployeeData aggregate(groupBy({EMP-ID}),",
+						"     each(match(name!='EMP-ID'), $$ = first($$))) ~> RemoveDuplicates",
+						"RemoveDuplicates sort(asc({EMP-ID}, true),",
+						"     caseInsensitive: true) ~> sortOnEmpId",
+						"sortOnEmpId sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     umask: 0022,",
+						"     preCommands: [],",
+						"     postCommands: [],",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> sink1"
+					]
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/DS_ADLS_adf_input_Employee1')]",
+				"[concat(variables('factoryId'), '/datasets/DS_ADLS_adf1_output_Employeenoduplicates')]"
 			]
 		}
 	]
