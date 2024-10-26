@@ -1,0 +1,56 @@
+{
+	"name": "DatawithoutDuplicates",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "DS_ADLS_adf_input_Employee1",
+						"type": "DatasetReference"
+					},
+					"name": "EmployeeData"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "DS_ADLS_adf1_output_Employeenoduplicates",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "RemoveDuplicates"
+				},
+				{
+					"name": "sortOnEmpId"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          {EMP-ID} as string,",
+				"          Name as string,",
+				"          Designation as string,",
+				"          Salary as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> EmployeeData",
+				"EmployeeData aggregate(groupBy({EMP-ID}),",
+				"     each(match(name != 'EMP-ID'), $$ = first($$))) ~> RemoveDuplicates",
+				"RemoveDuplicates sort(asc({EMP-ID}, true),",
+				"     caseInsensitive: true) ~> sortOnEmpId",
+				"sortOnEmpId sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     umask: 0022,",
+				"     preCommands: [],",
+				"     postCommands: [],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> sink1"
+			]
+		}
+	}
+}
