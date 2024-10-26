@@ -21,7 +21,11 @@
 					"name": "CopytoSQL"
 				}
 			],
-			"transformations": [],
+			"transformations": [
+				{
+					"name": "sort1"
+				}
+			],
 			"scriptLines": [
 				"source(output(",
 				"          Designation as string,",
@@ -34,7 +38,9 @@
 				"     ignoreNoFilesFound: false,",
 				"     moveFiles: ['/Jsonfiles','/Processed'],",
 				"     documentForm: 'documentPerLine') ~> SelectJosnFile",
-				"SelectJosnFile sink(allowSchemaDrift: true,",
+				"SelectJosnFile sort(asc({EMP-ID}, true),",
+				"     caseInsensitive: true) ~> sort1",
+				"sort1 sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     deletable:false,",
 				"     insertable:true,",

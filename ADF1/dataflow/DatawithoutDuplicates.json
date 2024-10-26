@@ -40,16 +40,18 @@
 				"     validateSchema: false,",
 				"     ignoreNoFilesFound: false) ~> EmployeeData",
 				"EmployeeData aggregate(groupBy({EMP-ID}),",
-				"     each(match(name != 'EMP-ID'), $$ = first($$))) ~> RemoveDuplicates",
+				"     each(match(name!='EMP-ID'), $$ = first($$))) ~> RemoveDuplicates",
 				"RemoveDuplicates sort(asc({EMP-ID}, true),",
 				"     caseInsensitive: true) ~> sortOnEmpId",
 				"sortOnEmpId sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
+				"     filePattern:'EmployeeNoduplicates',",
 				"     umask: 0022,",
 				"     preCommands: [],",
 				"     postCommands: [],",
 				"     skipDuplicateMapInputs: true,",
-				"     skipDuplicateMapOutputs: true) ~> sink1"
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('hash', 1)) ~> sink1"
 			]
 		}
 	}
