@@ -639,7 +639,8 @@
 									"type": "AzureBlobFSWriteSettings"
 								},
 								"formatSettings": {
-									"type": "JsonWriteSettings"
+									"type": "JsonWriteSettings",
+									"filePattern": "setOfObjects"
 								}
 							},
 							"enableStaging": false
@@ -862,7 +863,6 @@
 				"typeProperties": {
 					"location": {
 						"type": "AzureBlobFSLocation",
-						"fileName": "EmployeeNoduplicates",
 						"folderPath": "Jsonfiles",
 						"fileSystem": "adf1-output"
 					}
@@ -1437,7 +1437,11 @@
 							"name": "CopytoSQL"
 						}
 					],
-					"transformations": [],
+					"transformations": [
+						{
+							"name": "sort1"
+						}
+					],
 					"scriptLines": [
 						"source(output(",
 						"          Designation as string,",
@@ -1450,7 +1454,9 @@
 						"     ignoreNoFilesFound: false,",
 						"     moveFiles: ['/Jsonfiles','/Processed'],",
 						"     documentForm: 'documentPerLine') ~> SelectJosnFile",
-						"SelectJosnFile sink(allowSchemaDrift: true,",
+						"SelectJosnFile sort(asc({EMP-ID}, true),",
+						"     caseInsensitive: true) ~> sort1",
+						"sort1 sink(allowSchemaDrift: true,",
 						"     validateSchema: false,",
 						"     deletable:false,",
 						"     insertable:true,",
@@ -1610,11 +1616,13 @@
 						"     caseInsensitive: true) ~> sortOnEmpId",
 						"sortOnEmpId sink(allowSchemaDrift: true,",
 						"     validateSchema: false,",
+						"     filePattern:'EmployeeNoduplicates',",
 						"     umask: 0022,",
 						"     preCommands: [],",
 						"     postCommands: [],",
 						"     skipDuplicateMapInputs: true,",
-						"     skipDuplicateMapOutputs: true) ~> sink1"
+						"     skipDuplicateMapOutputs: true,",
+						"     partitionBy('hash', 1)) ~> sink1"
 					]
 				}
 			},

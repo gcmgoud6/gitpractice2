@@ -218,7 +218,6 @@
 				"typeProperties": {
 					"location": {
 						"type": "AzureBlobFSLocation",
-						"fileName": "EmployeeNoduplicates",
 						"folderPath": "Jsonfiles",
 						"fileSystem": "adf1-output"
 					}
