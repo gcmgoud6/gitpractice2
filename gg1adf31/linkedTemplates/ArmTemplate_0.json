@@ -649,20 +649,21 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/DS_Storage_gg1storage3')]",
+			"name": "[concat(parameters('factoryName'), '/DS_MergeAllFiles')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"linkedServiceName": {
-					"referenceName": "LS_Storage_gg1storage3",
+					"referenceName": "LS_ADLS_gg1adls3",
 					"type": "LinkedServiceReference"
 				},
 				"annotations": [],
 				"type": "DelimitedText",
 				"typeProperties": {
 					"location": {
-						"type": "AzureBlobStorageLocation",
-						"container": "adf-source"
+						"type": "AzureBlobFSLocation",
+						"fileName": "OrdersData",
+						"fileSystem": "adf1-source"
 					},
 					"columnDelimiter": ",",
 					"escapeChar": "\\",
@@ -672,7 +673,7 @@
 				"schema": []
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/LS_Storage_gg1storage3')]"
+				"[concat(variables('factoryId'), '/linkedServices/LS_ADLS_gg1adls3')]"
 			]
 		}
 	]
