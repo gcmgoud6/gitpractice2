@@ -259,6 +259,59 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/DS_adls_adf1_input_orders')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LS_ADLS_gg1adls3",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "orders.csv",
+						"fileSystem": "adf1-input"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "orderid",
+						"type": "String"
+					},
+					{
+						"name": "itemname ",
+						"type": "String"
+					},
+					{
+						"name": "price_of_item",
+						"type": "String"
+					},
+					{
+						"name": "quantity",
+						"type": "String"
+					},
+					{
+						"name": "total_cost",
+						"type": "String"
+					},
+					{
+						"name": "LastModifytime",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/LS_ADLS_gg1adls3')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/DS_adls_adf1_output')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -281,6 +334,59 @@
 					"quoteChar": "\""
 				},
 				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/LS_ADLS_gg1adls3')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DS_adls_adf1_output_Orders')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LS_ADLS_gg1adls3",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "orders (1).csv",
+						"fileSystem": "adf1-output"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "orderid",
+						"type": "String"
+					},
+					{
+						"name": "itemname ",
+						"type": "String"
+					},
+					{
+						"name": "price_of_item",
+						"type": "String"
+					},
+					{
+						"name": "quantity",
+						"type": "String"
+					},
+					{
+						"name": "total_cost",
+						"type": "String"
+					},
+					{
+						"name": "LastModifytime",
+						"type": "String"
+					}
+				]
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/linkedServices/LS_ADLS_gg1adls3')]"
@@ -568,6 +674,108 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/DF_IncrementalloadofAFileData')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "DS_adls_adf1_input_orders",
+								"type": "DatasetReference"
+							},
+							"name": "sourceOrders"
+						},
+						{
+							"dataset": {
+								"referenceName": "DS_adls_adf1_output_Orders",
+								"type": "DatasetReference"
+							},
+							"name": "DestinationOrders"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "DS_adls_adf1_output_Orders",
+								"type": "DatasetReference"
+							},
+							"name": "sink1"
+						}
+					],
+					"transformations": [
+						{
+							"name": "HashColumnforSourcefile"
+						},
+						{
+							"name": "HashColumnforDestinationOrders"
+						},
+						{
+							"name": "ifnotexist"
+						}
+					],
+					"scriptLines": [
+						"source(output(",
+						"          orderid as string,",
+						"          {itemname } as string,",
+						"          price_of_item as string,",
+						"          quantity as string,",
+						"          total_cost as string,",
+						"          LastModifytime as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     ignoreNoFilesFound: false) ~> sourceOrders",
+						"source(output(",
+						"          orderid as string,",
+						"          {itemname } as string,",
+						"          price_of_item as string,",
+						"          quantity as string,",
+						"          total_cost as string,",
+						"          LastModifytime as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     ignoreNoFilesFound: false) ~> DestinationOrders",
+						"sourceOrders derive(SourceHashColumn = sha2(256, orderid)) ~> HashColumnforSourcefile",
+						"DestinationOrders derive(DestinationHashColumn = sha2(256, orderid)) ~> HashColumnforDestinationOrders",
+						"HashColumnforSourcefile, HashColumnforDestinationOrders exists(SourceHashColumn == DestinationHashColumn,",
+						"     negate:true,",
+						"     broadcast: 'auto')~> ifnotexist",
+						"ifnotexist sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     input(",
+						"          orderid as string,",
+						"          {itemname } as string,",
+						"          price_of_item as string,",
+						"          quantity as string,",
+						"          total_cost as string,",
+						"          LastModifytime as string",
+						"     ),",
+						"     umask: 0022,",
+						"     preCommands: [],",
+						"     postCommands: [],",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true,",
+						"     mapColumn(",
+						"          orderid,",
+						"          {itemname },",
+						"          price_of_item,",
+						"          quantity,",
+						"          total_cost,",
+						"          LastModifytime",
+						"     )) ~> sink1"
+					]
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/DS_adls_adf1_input_orders')]",
+				"[concat(variables('factoryId'), '/datasets/DS_adls_adf1_output_Orders')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/DF_dropduplicates')]",
 			"type": "Microsoft.DataFactory/factories/dataflows",
 			"apiVersion": "2018-06-01",
@@ -656,6 +864,53 @@
 				"[concat(variables('factoryId'), '/datasets/DS_adf1_input_Employee1')]",
 				"[concat(variables('factoryId'), '/datasets/DS_adf1_input_Employee2')]",
 				"[concat(variables('factoryId'), '/datasets/DS_DB_Employee_WithOutDuplicates')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/PL_IncrementalloadofAFileData')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "IncrementalloadofAFileData",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "DF_IncrementalloadofAFileData",
+								"type": "DataFlowReference",
+								"parameters": {},
+								"datasetParameters": {
+									"sourceOrders": {},
+									"DestinationOrders": {},
+									"sink1": {}
+								}
+							},
+							"staging": {},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							},
+							"traceLevel": "Fine"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/dataflows/DF_IncrementalloadofAFileData')]"
 			]
 		},
 		{
