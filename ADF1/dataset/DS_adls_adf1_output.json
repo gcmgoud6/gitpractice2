@@ -1,0 +1,23 @@
+{
+	"name": "DS_adls_adf1_output",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "LS_ADLS_gg1adls3",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"folderPath": "GT13MB",
+				"fileSystem": "adf1-output"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": []
+	}
+}
