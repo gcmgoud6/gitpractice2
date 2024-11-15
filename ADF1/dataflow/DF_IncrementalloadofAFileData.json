@@ -1,0 +1,96 @@
+{
+	"name": "DF_IncrementalloadofAFileData",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "DS_adls_adf1_input_orders",
+						"type": "DatasetReference"
+					},
+					"name": "sourceOrders"
+				},
+				{
+					"dataset": {
+						"referenceName": "DS_adls_adf1_output_Orders",
+						"type": "DatasetReference"
+					},
+					"name": "DestinationOrders"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "DS_adls_adf1_output_Orders",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "HashColumnforSourcefile"
+				},
+				{
+					"name": "HashColumnforDestinationOrders"
+				},
+				{
+					"name": "ifnotexist"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          orderid as string,",
+				"          {itemname } as string,",
+				"          price_of_item as string,",
+				"          quantity as string,",
+				"          total_cost as string,",
+				"          LastModifytime as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> sourceOrders",
+				"source(output(",
+				"          orderid as string,",
+				"          {itemname } as string,",
+				"          price_of_item as string,",
+				"          quantity as string,",
+				"          total_cost as string,",
+				"          LastModifytime as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> DestinationOrders",
+				"sourceOrders derive(SourceHashColumn = sha2(256, orderid)) ~> HashColumnforSourcefile",
+				"DestinationOrders derive(DestinationHashColumn = sha2(256, orderid)) ~> HashColumnforDestinationOrders",
+				"HashColumnforSourcefile, HashColumnforDestinationOrders exists(SourceHashColumn == DestinationHashColumn,",
+				"     negate:true,",
+				"     broadcast: 'auto')~> ifnotexist",
+				"ifnotexist sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          orderid as string,",
+				"          {itemname } as string,",
+				"          price_of_item as string,",
+				"          quantity as string,",
+				"          total_cost as string,",
+				"          LastModifytime as string",
+				"     ),",
+				"     umask: 0022,",
+				"     preCommands: [],",
+				"     postCommands: [],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     mapColumn(",
+				"          orderid,",
+				"          {itemname },",
+				"          price_of_item,",
+				"          quantity,",
+				"          total_cost,",
+				"          LastModifytime",
+				"     )) ~> sink1"
+			]
+		}
+	}
+}
