@@ -1,0 +1,84 @@
+{
+	"name": "DF_dropduplicates",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "DS_adf1_input_Employee1",
+						"type": "DatasetReference"
+					},
+					"name": "Employee1"
+				},
+				{
+					"dataset": {
+						"referenceName": "DS_adf1_input_Employee2",
+						"type": "DatasetReference"
+					},
+					"name": "Employee2"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "DS_DB_Employee_WithOutDuplicates",
+						"type": "DatasetReference"
+					},
+					"name": "LoadingIntoDB"
+				}
+			],
+			"transformations": [
+				{
+					"name": "AllRecords"
+				},
+				{
+					"name": "dropduplicates"
+				},
+				{
+					"name": "sort1"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          {EMP-ID} as integer,",
+				"          Name as string,",
+				"          Designation as string,",
+				"          Salary as integer",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> Employee1",
+				"source(output(",
+				"          {EMP-ID} as integer,",
+				"          Name as string,",
+				"          Designation as string,",
+				"          Salary as integer",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> Employee2",
+				"Employee1, Employee2 union(byName: true)~> AllRecords",
+				"AllRecords aggregate(groupBy({EMP-ID}),",
+				"     each(match(name != 'EMP-ID'), $$ = first($$))) ~> dropduplicates",
+				"dropduplicates sort(asc({EMP-ID}, true)) ~> sort1",
+				"sort1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError',",
+				"     mapColumn(",
+				"          {EMP-ID},",
+				"          Name,",
+				"          Designation,",
+				"          Salary",
+				"     )) ~> LoadingIntoDB"
+			]
+		}
+	}
+}
