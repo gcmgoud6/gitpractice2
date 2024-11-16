@@ -1,0 +1,49 @@
+{
+	"name": "DS_db_Orders",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "LS_DB_ggdb1source",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "orderid",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "itemname",
+				"type": "varchar"
+			},
+			{
+				"name": "price_of_item",
+				"type": "decimal",
+				"precision": 10,
+				"scale": 2
+			},
+			{
+				"name": "quantity",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "total_cost",
+				"type": "decimal",
+				"precision": 10,
+				"scale": 2
+			},
+			{
+				"name": "LastModifytime",
+				"type": "datetime",
+				"precision": 23,
+				"scale": 3
+			}
+		],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "orders"
+		}
+	}
+}
