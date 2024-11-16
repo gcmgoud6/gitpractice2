@@ -850,6 +850,60 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/DS_db_Orders')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LS_DB_ggdb1source",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "orderid",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "itemname",
+						"type": "varchar"
+					},
+					{
+						"name": "price_of_item",
+						"type": "decimal",
+						"precision": 10,
+						"scale": 2
+					},
+					{
+						"name": "quantity",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "total_cost",
+						"type": "decimal",
+						"precision": 10,
+						"scale": 2
+					},
+					{
+						"name": "LastModifytime",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "orders"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/LS_DB_ggdb1source')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/LS_ADLS_gg1adls3')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
 			"apiVersion": "2018-06-01",
@@ -933,7 +987,7 @@
 						},
 						{
 							"dataset": {
-								"referenceName": "DS_adls_adf1_output_Orders",
+								"referenceName": "DS_db_Orders",
 								"type": "DatasetReference"
 							},
 							"name": "DestinationOrders"
@@ -942,7 +996,7 @@
 					"sinks": [
 						{
 							"dataset": {
-								"referenceName": "DS_adls_adf1_output_Orders",
+								"referenceName": "DS_db_Orders",
 								"type": "DatasetReference"
 							},
 							"name": "sink1"
@@ -961,61 +1015,67 @@
 					],
 					"scriptLines": [
 						"source(output(",
-						"          orderid as string,",
+						"          orderid as integer,",
 						"          {itemname } as string,",
-						"          price_of_item as string,",
-						"          quantity as string,",
-						"          total_cost as string,",
-						"          LastModifytime as string",
+						"          price_of_item as decimal(10,0) '000,000,000.000',",
+						"          quantity as integer,",
+						"          total_cost as decimal(10,0) '000,000,000.000',",
+						"          LastModifytime as timestamp 'MM/dd/yyyy HH:mm:ss'",
 						"     ),",
 						"     allowSchemaDrift: true,",
 						"     validateSchema: false,",
 						"     ignoreNoFilesFound: false) ~> sourceOrders",
 						"source(output(",
-						"          orderid as string,",
-						"          {itemname } as string,",
-						"          price_of_item as string,",
-						"          quantity as string,",
-						"          total_cost as string,",
-						"          LastModifytime as string",
+						"          orderid as integer,",
+						"          itemname as string,",
+						"          price_of_item as decimal(10,2),",
+						"          quantity as integer,",
+						"          total_cost as decimal(10,2),",
+						"          LastModifytime as timestamp",
 						"     ),",
 						"     allowSchemaDrift: true,",
 						"     validateSchema: false,",
-						"     ignoreNoFilesFound: false) ~> DestinationOrders",
+						"     isolationLevel: 'READ_UNCOMMITTED',",
+						"     format: 'table') ~> DestinationOrders",
 						"sourceOrders derive(SourceHashColumn = sha2(256, orderid)) ~> HashColumnforSourcefile",
 						"DestinationOrders derive(DestinationHashColumn = sha2(256, orderid)) ~> HashColumnforDestinationOrders",
-						"HashColumnforSourcefile, HashColumnforDestinationOrders exists(SourceHashColumn == DestinationHashColumn,",
+						"HashColumnforSourcefile, HashColumnforDestinationOrders exists(SourceHashColumn==DestinationHashColumn,",
 						"     negate:true,",
 						"     broadcast: 'auto')~> ifnotexist",
 						"ifnotexist sink(allowSchemaDrift: true,",
 						"     validateSchema: false,",
 						"     input(",
-						"          orderid as string,",
-						"          {itemname } as string,",
-						"          price_of_item as string,",
-						"          quantity as string,",
-						"          total_cost as string,",
-						"          LastModifytime as string",
+						"          orderid as integer,",
+						"          itemname as string,",
+						"          price_of_item as decimal(10,2),",
+						"          quantity as integer,",
+						"          total_cost as decimal(10,2),",
+						"          LastModifytime as timestamp",
 						"     ),",
-						"     umask: 0022,",
-						"     preCommands: [],",
-						"     postCommands: [],",
+						"     deletable:false,",
+						"     insertable:true,",
+						"     updateable:false,",
+						"     upsertable:false,",
+						"     format: 'table',",
 						"     skipDuplicateMapInputs: true,",
 						"     skipDuplicateMapOutputs: true,",
+						"     errorHandlingOption: 'stopOnFirstError',",
 						"     mapColumn(",
 						"          orderid,",
-						"          {itemname },",
+						"          itemname = {itemname },",
 						"          price_of_item,",
 						"          quantity,",
 						"          total_cost,",
 						"          LastModifytime",
-						"     )) ~> sink1"
+						"     ),",
+						"     preCommands: [],",
+						"     postCommands: []) ~> sink1"
 					]
 				}
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/DS_adls_adf1_input_orders')]",
-				"[concat(variables('factoryId'), '/datasets/DS_adls_adf1_output_Orders')]"
+				"[concat(variables('factoryId'), '/datasets/DS_db_Orders')]"
 			]
 		},
 		{
