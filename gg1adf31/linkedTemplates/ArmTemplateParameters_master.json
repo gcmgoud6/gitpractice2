@@ -5,6 +5,9 @@
 		"factoryName": {
 			"value": "gg1adf31"
 		},
+		"AzureDatabricks1_accessToken": {
+			"value": ""
+		},
 		"LS_ADLS_gg1adls3_accountKey": {
 			"value": ""
 		},
@@ -13,6 +16,9 @@
 		},
 		"LS_Storage_gg1storage3_connectionString": {
 			"value": ""
+		},
+		"AzureDatabricks1_properties_typeProperties_existingClusterId": {
+			"value": "1113-110210-z433i4om"
 		},
 		"LS_ADLS_gg1adls3_properties_typeProperties_url": {
 			"value": "https://gg1adls3.dfs.core.windows.net/"

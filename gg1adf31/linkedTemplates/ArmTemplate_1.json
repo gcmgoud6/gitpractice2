@@ -13,6 +13,198 @@
 	},
 	"resources": [
 		{
+			"name": "[concat(parameters('factoryName'), '/DF_IncrementalloadofAFileData')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "DS_adls_adf1_input_orders",
+								"type": "DatasetReference"
+							},
+							"name": "sourceOrders"
+						},
+						{
+							"dataset": {
+								"referenceName": "DS_db_Orders",
+								"type": "DatasetReference"
+							},
+							"name": "DestinationOrders"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "DS_db_Orders",
+								"type": "DatasetReference"
+							},
+							"name": "sink1"
+						}
+					],
+					"transformations": [
+						{
+							"name": "HashColumnforSourcefile"
+						},
+						{
+							"name": "HashColumnforDestinationOrders"
+						},
+						{
+							"name": "ifnotexist"
+						}
+					],
+					"scriptLines": [
+						"source(output(",
+						"          orderid as integer,",
+						"          {itemname } as string,",
+						"          price_of_item as decimal(10,0) '000,000,000.000',",
+						"          quantity as integer,",
+						"          total_cost as decimal(10,0) '000,000,000.000',",
+						"          LastModifytime as timestamp 'MM/dd/yyyy HH:mm:ss'",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     ignoreNoFilesFound: false) ~> sourceOrders",
+						"source(output(",
+						"          orderid as integer,",
+						"          itemname as string,",
+						"          price_of_item as decimal(10,2),",
+						"          quantity as integer,",
+						"          total_cost as decimal(10,2),",
+						"          LastModifytime as timestamp",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     isolationLevel: 'READ_UNCOMMITTED',",
+						"     format: 'table') ~> DestinationOrders",
+						"sourceOrders derive(SourceHashColumn = sha2(256, orderid)) ~> HashColumnforSourcefile",
+						"DestinationOrders derive(DestinationHashColumn = sha2(256, orderid)) ~> HashColumnforDestinationOrders",
+						"HashColumnforSourcefile, HashColumnforDestinationOrders exists(SourceHashColumn==DestinationHashColumn,",
+						"     negate:true,",
+						"     broadcast: 'auto')~> ifnotexist",
+						"ifnotexist sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     input(",
+						"          orderid as integer,",
+						"          itemname as string,",
+						"          price_of_item as decimal(10,2),",
+						"          quantity as integer,",
+						"          total_cost as decimal(10,2),",
+						"          LastModifytime as timestamp",
+						"     ),",
+						"     deletable:false,",
+						"     insertable:true,",
+						"     updateable:false,",
+						"     upsertable:false,",
+						"     format: 'table',",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true,",
+						"     errorHandlingOption: 'stopOnFirstError',",
+						"     mapColumn(",
+						"          orderid,",
+						"          itemname = {itemname },",
+						"          price_of_item,",
+						"          quantity,",
+						"          total_cost,",
+						"          LastModifytime",
+						"     ),",
+						"     preCommands: [],",
+						"     postCommands: []) ~> sink1"
+					]
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DF_dropduplicates')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "DS_adf1_input_Employee1",
+								"type": "DatasetReference"
+							},
+							"name": "Employee1"
+						},
+						{
+							"dataset": {
+								"referenceName": "DS_adf1_input_Employee2",
+								"type": "DatasetReference"
+							},
+							"name": "Employee2"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "DS_DB_Employee_WithOutDuplicates",
+								"type": "DatasetReference"
+							},
+							"name": "LoadingIntoDB"
+						}
+					],
+					"transformations": [
+						{
+							"name": "AllRecords"
+						},
+						{
+							"name": "dropduplicates"
+						},
+						{
+							"name": "sort1"
+						}
+					],
+					"scriptLines": [
+						"source(output(",
+						"          {EMP-ID} as integer,",
+						"          Name as string,",
+						"          Designation as string,",
+						"          Salary as integer",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     ignoreNoFilesFound: false) ~> Employee1",
+						"source(output(",
+						"          {EMP-ID} as integer,",
+						"          Name as string,",
+						"          Designation as string,",
+						"          Salary as integer",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     ignoreNoFilesFound: false) ~> Employee2",
+						"Employee1, Employee2 union(byName: true)~> AllRecords",
+						"AllRecords aggregate(groupBy({EMP-ID}),",
+						"     each(match(name!='EMP-ID'), $$ = first($$))) ~> dropduplicates",
+						"dropduplicates sort(asc({EMP-ID}, true)) ~> sort1",
+						"sort1 sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     deletable:false,",
+						"     insertable:true,",
+						"     updateable:false,",
+						"     upsertable:false,",
+						"     format: 'table',",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true,",
+						"     errorHandlingOption: 'stopOnFirstError',",
+						"     mapColumn(",
+						"          {EMP-ID},",
+						"          Name,",
+						"          Designation,",
+						"          Salary",
+						"     )) ~> LoadingIntoDB"
+					]
+				}
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/PL_IncrementalloadofAFileData')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
@@ -55,7 +247,9 @@
 				},
 				"annotations": []
 			},
-			"dependsOn": []
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/dataflows/DF_IncrementalloadofAFileData')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/PL_dropDuplicates')]",
@@ -100,7 +294,9 @@
 				},
 				"annotations": []
 			},
-			"dependsOn": []
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/dataflows/DF_dropduplicates')]"
+			]
 		}
 	]
 }
