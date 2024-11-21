@@ -15,7 +15,7 @@
 			"sinks": [
 				{
 					"dataset": {
-						"referenceName": "DS_adls_ValidMobileNo",
+						"referenceName": "DS_adls_validMobileNo",
 						"type": "DatasetReference"
 					},
 					"name": "ValidMobileNos"
@@ -47,7 +47,14 @@
 				"     disjoint: false) ~> split1@(ValidMobileNo, InvalidMobileNo)",
 				"split1@ValidMobileNo sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
-				"     filePattern:'VaalidMobileNo.csv',",
+				"     input(",
+				"          orderid as string,",
+				"          {itemname } as string,",
+				"          price_of_item as string,",
+				"          quantity as string,",
+				"          total_cost as string,",
+				"          LastModifytime as string",
+				"     ),",
 				"     umask: 0022,",
 				"     preCommands: [],",
 				"     postCommands: [],",
@@ -55,7 +62,6 @@
 				"     skipDuplicateMapOutputs: true) ~> ValidMobileNos",
 				"split1@InvalidMobileNo sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
-				"     filePattern:'InValidMobileNo.csv',",
 				"     umask: 0022,",
 				"     preCommands: [],",
 				"     postCommands: [],",
