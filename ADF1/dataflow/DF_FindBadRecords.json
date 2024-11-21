@@ -1,0 +1,67 @@
+{
+	"name": "DF_FindBadRecords",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "DS_adls_Mobileno",
+						"type": "DatasetReference"
+					},
+					"name": "source1"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "DS_adls_ValidMobileNo",
+						"type": "DatasetReference"
+					},
+					"name": "ValidMobileNos"
+				},
+				{
+					"dataset": {
+						"referenceName": "DS_adls_InvalidMobileNo",
+						"type": "DatasetReference"
+					},
+					"name": "InvalidMobileNos"
+				}
+			],
+			"transformations": [
+				{
+					"name": "split1"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          {EMP-ID} as string,",
+				"          Name as string,",
+				"          Mobile_No as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> source1",
+				"source1 split(length(Mobile_No) >= 10,",
+				"     length('Mobile_No') < 10,",
+				"     disjoint: false) ~> split1@(ValidMobileNo, InvalidMobileNo)",
+				"split1@ValidMobileNo sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     filePattern:'VaalidMobileNo.csv',",
+				"     umask: 0022,",
+				"     preCommands: [],",
+				"     postCommands: [],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> ValidMobileNos",
+				"split1@InvalidMobileNo sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     filePattern:'InValidMobileNo.csv',",
+				"     umask: 0022,",
+				"     preCommands: [],",
+				"     postCommands: [],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> InvalidMobileNos"
+			]
+		}
+	}
+}
